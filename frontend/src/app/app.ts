@@ -1,12 +1,33 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { VisitorService } from './visitor.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [CommonModule, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {
-  protected readonly title = signal('kiosk-app');
+export class AppComponent {
+  visitorData: any = null;
+  loading: boolean = false;
+
+  constructor(private visitorService: VisitorService) { }
+
+  onScanClick() {
+    this.loading = true;
+    this.visitorService.getScannedData().subscribe({
+      next: (data) => {
+        this.visitorData = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        alert("Make sure your Python Backend is running!");
+        console.error(err);
+        this.loading = false;
+      }
+    });
+  }
 }
