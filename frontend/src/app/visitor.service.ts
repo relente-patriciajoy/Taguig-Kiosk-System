@@ -15,4 +15,8 @@ export class VisitorService {
   getScannedData(): Observable<any> {
     return this.http.get<any>(this.apiUrl);
   }
+
+  getQrCode(controlNo: string, purpose: string) {
+    return this.http.get<any>(`http://127.0.0.1:8000/generate-qr?control_no=${controlNo}&purpose=${purpose}`);
+  }
 }

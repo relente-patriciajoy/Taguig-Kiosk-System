@@ -1,0 +1,244 @@
+/* --- Root & Layout --- */
+.kiosk-container {
+  text-align: center;
+  padding: 50px;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.kiosk-header h1 {
+  color: #d32f2f;
+  /* Taguig Red */
+  margin-bottom: 5px;
+  letter-spacing: 1px;
+}
+
+.kiosk-header p {
+  color: #555;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* --- Navigation & Icons --- */
+.icon-container {
+  margin: 40px 0;
+}
+
+.id-icon {
+  font-size: 100px;
+}
+
+.btn-link {
+  margin-top: 20px;
+  background: none;
+  border: none;
+  color: #777;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* --- Main Action Buttons --- */
+.btn-scan {
+  padding: 20px 60px;
+  font-size: 22px;
+  cursor: pointer;
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3);
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.btn-scan:hover:not(:disabled) {
+  background-color: #b71c1c;
+  transform: scale(1.05);
+}
+
+.btn-scan:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* --- Selection Grids (ID & Purpose) --- */
+.purpose-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  max-width: 600px;
+  margin: 30px auto;
+}
+
+.btn-purpose {
+  padding: 15px;
+  font-size: 16px;
+  border: 2px solid #d32f2f;
+  background: white;
+  color: #d32f2f;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.btn-purpose:hover {
+  background-color: #d32f2f;
+  color: white;
+}
+
+/* --- Visitor Pass & QR Section --- */
+.visitor-pass {
+  max-width: 400px;
+  margin: 20px auto;
+  border: 2px solid #333;
+  padding: 30px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.pass-details {
+  text-align: left;
+  margin: 20px 0;
+  line-height: 1.6;
+}
+
+.qr-container {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.qr-code-img {
+  width: 200px;
+  height: 200px;
+  border: 1px solid #eee;
+  padding: 10px;
+}
+
+/* --- Final Action Buttons --- */
+.pass-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-print {
+  padding: 15px;
+  background-color: white;
+  color: #d32f2f;
+  border: 2px solid #d32f2f;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-print:hover {
+  background-color: #f9f9f9;
+}
+
+.btn-done-final {
+  padding: 15px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* --- Animations --- */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Print Settings --- */
+@media print {
+  @page {
+    margin: 0;
+  }
+
+  /* 1. Completely remove background elements from the print layout */
+  .kiosk-header,
+  .btn-link,
+  .icon-container {
+    display: none !important;
+  }
+
+  /* 2. Reset the body to center everything */
+  body {
+    margin: 0;
+    padding: 0;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    background-color: white;
+  }
+
+  /* 3. Force the pass to be the only thing visible and centered */
+  body * {
+    visibility: hidden;
+  }
+
+  #printable-pass,
+  #printable-pass * {
+    visibility: visible;
+    display: block;
+    /* Ensures elements stack vertically */
+  }
+
+  #printable-pass {
+    position: static;
+    /* Let flexbox handle positioning */
+    width: 300px;
+    /* Typical width for an 80mm thermal printer */
+    margin: 0 auto;
+    border: none;
+    box-shadow: none;
+    padding: 20px;
+    text-align: center;
+    /* Centers all text within the pass */
+  }
+
+  /* 4. Center the QR image specifically */
+  .qr-container {
+    display: flex !important;
+    justify-content: center !important;
+    margin: 15px 0 !important;
+  }
+
+  .qr-code-img {
+    width: 180px !important;
+    height: 180px !important;
+    display: block !important;
+    margin: 0 auto !important;
+  }
+
+  /* 5. Clean up details list */
+  .pass-details {
+    text-align: left;
+    /* Keep text aligned left for readability */
+    display: inline-block;
+    /* Allows the container to be centered */
+    margin: 0 auto;
+  }
+
+  /* 6. Hide buttons on receipt */
+  .no-print {
+    display: none !important;
+  }
+}

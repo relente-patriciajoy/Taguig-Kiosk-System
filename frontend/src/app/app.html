@@ -1,21 +1,73 @@
-<div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
-  <h1>Taguig City Visitor Kiosk</h1>
-  <p>Please place your ID on the scanner and click the button below.</p>
+<div class="kiosk-container">
 
-  <button (click)="onScanClick()" style="padding: 20px 40px; font-size: 20px; cursor: pointer; background-color: #d32f2f; color: white; border: none; border-radius: 10px;">
-    {{ loading ? 'Reading ID...' : 'TAP TO SCAN ID' }}
-  </button>
+  <header class="kiosk-header">
+    <h1>LUNGSOD NG TAGUIG</h1>
+    <p>VISITOR KIOSK SYSTEM</p>
+  </header>
 
-  <hr style="margin: 40px 0;">
+  <div *ngIf="currentStep === 'home'" class="fade-in">
+    <div class="icon-container">
+      <span class="id-icon">🪪</span>
+    </div>
+    <h2>Welcome to Taguig City Hall</h2>
+    <p>Please select the ID you will use today:</p>
 
-  <div *ngIf="visitorData" style="border: 2px solid #333; padding: 20px; display: inline-block; text-align: left; background: #f9f9f9;">
-    <h3>Visitor Confirmation</h3>
-    <p><strong>Control #:</strong> {{ visitorData.control_no }}</p>
-    <p><strong>Name:</strong> {{ visitorData.full_name }}</p>
-    <p><strong>ID Type:</strong> {{ visitorData.id_type }}</p>
-    <p><strong>Address:</strong> {{ visitorData.address }}</p>
-    <p><strong>Time In:</strong> {{ visitorData.time_in }}</p>
-
-    <button style="background-color: #2e7d32; color: white; padding: 10px; width: 100%;">PROCEED TO PURPOSE OF VISIT</button>
+    <div class="purpose-grid">
+      <button *ngFor="let id of idTypes" (click)="selectIdType(id)" class="btn-purpose">
+        {{ id }}
+      </button>
+    </div>
   </div>
+
+  <div *ngIf="currentStep === 'scan'" class="fade-in">
+    <div class="icon-container">
+      <span class="id-icon">🔍</span>
+    </div>
+    <h2>Ready to Scan</h2>
+    <p>Please prepare your <strong>{{ selectedIdType }}</strong></p>
+    <button (click)="onScanClick()" [disabled]="loading" class="btn-scan">
+      {{ loading ? 'SCANNING...' : 'TAP TO START SCAN' }}
+    </button>
+    <br>
+    <button (click)="resetKiosk()" class="btn-link">Back to ID Selection</button>
+  </div>
+
+  <div *ngIf="currentStep === 'purpose'" class="fade-in">
+    <h2>Hello, {{ visitorData?.full_name }}!</h2>
+    <p>What is the purpose of your visit today?</p>
+
+    <div class="purpose-grid">
+      <button *ngFor="let p of purposes" (click)="selectPurpose(p)" class="btn-purpose">
+        {{ p }}
+      </button>
+    </div>
+
+    <button (click)="resetKiosk()" class="btn-link">
+      Cancel and Start Over
+    </button>
+  </div>
+
+  <div *ngIf="currentStep === 'ticket'" class="fade-in" id="printable-pass-container">
+    <div class="visitor-pass" id="printable-pass">
+      <h3>VISITOR PASS</h3>
+
+      <div class="pass-details">
+        <p><strong>NAME:</strong> {{ visitorData?.full_name }}</p>
+        <p><strong>ID TYPE:</strong> {{ selectedIdType }}</p>
+        <p><strong>PURPOSE:</strong> {{ selectedPurpose }}</p>
+        <p><strong>TIME:</strong> {{ visitorData?.time_in }}</p>
+        <p><strong>CONTROL #:</strong> {{ visitorData?.control_no }}</p>
+      </div>
+
+      <div class="qr-container">
+        <img *ngIf="qrCodeImage" [src]="qrCodeImage" alt="Exit QR Code" class="qr-code-img">
+      </div>
+
+      <div class="pass-actions no-print">
+        <button (click)="printPass()" class="btn-print">PRINT RECEIPT</button>
+        <button (click)="resetKiosk()" class="btn-done-final">DONE</button>
+      </div>
+    </div>
+  </div>
+
 </div>
