@@ -1,17 +1,16 @@
 <div class="kiosk-container">
-
   <header class="kiosk-header">
     <h1>LUNGSOD NG TAGUIG</h1>
     <p>VISITOR KIOSK SYSTEM</p>
   </header>
 
+  <!-- STEP: HOME — Select ID Type -->
   <div *ngIf="currentStep === 'home'" class="fade-in">
     <div class="icon-container">
       <span class="id-icon">🪪</span>
     </div>
     <h2>Welcome to Taguig City Hall</h2>
     <p>Please select the ID you will use today:</p>
-
     <div class="purpose-grid">
       <button *ngFor="let id of idTypes" (click)="selectIdType(id)" class="btn-purpose">
         {{ id }}
@@ -19,53 +18,179 @@
     </div>
   </div>
 
+  <!-- STEP: SCAN — Camera viewfinder + capture -->
   <div *ngIf="currentStep === 'scan'" class="fade-in">
-    <div class="icon-container">
-      <span class="id-icon">🔍</span>
+    <div class="camera-container">
+
+      <!-- PHONE camera: MJPEG stream loads directly in <img> tag -->
+      <img
+        #phoneImgEl
+        *ngIf="usePhoneCamera && cameraState === 'ready'"
+        [src]="PHONE_CAMERA_URL"
+        class="video-feed"
+        alt="Phone camera stream">
+
+      <!-- LAPTOP camera: getUserMedia stream via <video> tag -->
+      <video
+        #videoEl
+        autoplay
+        muted
+        playsinline
+        class="video-feed"
+        [class.video-hidden]="usePhoneCamera || cameraState !== 'ready'">
+      </video>
+
+      <!-- Hidden canvas for grabbing the still frame -->
+      <canvas #canvasEl class="canvas-hidden"></canvas>
+
+      <!-- Captured photo preview -->
+      <img
+        *ngIf="cameraState === 'captured'"
+        [src]="capturedImageUrl"
+        class="captured-preview"
+        alt="Captured ID">
+
+      <!-- Initializing overlay -->
+      <div *ngIf="cameraState === 'initializing'" class="camera-error-overlay">
+        <span class="overlay-icon">⏳</span>
+        <p>Starting camera...</p>
+      </div>
+
+      <!-- Hardware error overlay -->
+      <div *ngIf="cameraState === 'error-hardware'" class="camera-error-overlay">
+        <span class="overlay-icon">📷</span>
+        <p>Camera is currently unavailable.</p>
+        <p class="overlay-hint">Another app may be using the camera. Please close it and try again.</p>
+        <button (click)="retryCamera()" class="btn-retry">🔄 Retry Camera</button>
+      </div>
+
+      <!-- Permission denied overlay -->
+      <div *ngIf="cameraState === 'error-permission'" class="camera-error-overlay">
+        <span class="overlay-icon">🚫</span>
+        <p>Camera permission was denied.</p>
+        <p class="overlay-hint">
+          Click the 🔒 icon in the address bar,<br>
+          set Camera to <strong>Allow</strong>, then reload.
+        </p>
+      </div>
+
+      <!-- ID placement guide — shown when camera is live -->
+      <div *ngIf="cameraState === 'ready'" class="id-guide-overlay">
+        <div class="id-guide-box">
+          <div class="corner top-left"></div>
+          <div class="corner top-right"></div>
+          <div class="corner bottom-left"></div>
+          <div class="corner bottom-right"></div>
+        </div>
+        <p class="guide-label">Align your ID within the box</p>
+      </div>
+
+      <!-- Captured badge -->
+      <div *ngIf="cameraState === 'captured'" class="captured-badge">
+        ✅ Photo Taken
+      </div>
     </div>
-    <h2>Ready to Scan</h2>
-    <p>Please prepare your <strong>{{ selectedIdType }}</strong></p>
-    <button (click)="onScanClick()" [disabled]="loading" class="btn-scan">
-      {{ loading ? 'SCANNING...' : 'TAP TO START SCAN' }}
+
+    <h2>Scanning: {{ selectedIdType }}</h2>
+
+    <p *ngIf="cameraState === 'ready'" class="scan-instruction">
+      Position your ID flat and fully visible inside the guide box, then tap Capture.
+    </p>
+
+    <!-- Capture button -->
+    <button
+      *ngIf="cameraState === 'ready'"
+      (click)="captureID()"
+      class="btn-capture">
+      📷 Capture ID
     </button>
-    <br>
-    <button (click)="resetKiosk()" class="btn-link">Back to ID Selection</button>
+
+    <!-- Post-capture actions -->
+    <div *ngIf="cameraState === 'captured'" class="captured-actions">
+      <p class="scan-instruction">Is your ID clearly visible in the photo?</p>
+      <div class="action-row">
+        <button (click)="retakePhoto()" class="btn-retake">↩ Retake</button>
+        <button (click)="submitCapture()" class="btn-submit" [disabled]="loading">
+          <span *ngIf="!loading">✅ Looks Good — Submit</span>
+          <span *ngIf="loading">⏳ Reading ID...</span>
+        </button>
+      </div>
+    </div>
+
+    <button (click)="resetKiosk()" class="btn-link">← Back to ID Selection</button>
   </div>
 
+  <!-- STEP: PREVIEW — Confirm extracted info -->
+  <div *ngIf="currentStep === 'preview'" class="fade-in">
+    <h2>Please Verify Your Information</h2>
+    <p class="scan-instruction">Make sure all details below are correct before proceeding.</p>
+
+    <div class="info-card">
+      <div *ngIf="capturedImageUrl" class="id-thumbnail-wrapper">
+        <img [src]="capturedImageUrl" class="id-thumbnail" alt="Your ID">
+      </div>
+      <div class="info-row">
+        <span class="info-label">Full Name</span>
+        <span class="info-value">{{ visitorData?.full_name }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Birthday</span>
+        <span class="info-value">{{ visitorData?.birthday }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Address</span>
+        <span class="info-value">{{ visitorData?.address }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">ID Number</span>
+        <span class="info-value">{{ visitorData?.id_number }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">ID Type</span>
+        <span class="info-value">{{ selectedIdType }}</span>
+      </div>
+      <div class="info-row highlight-row">
+        <span class="info-label">Control #</span>
+        <span class="info-value">{{ visitorData?.control_no }}</span>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button (click)="retakePhoto()" class="btn-retake">↩ Rescan ID</button>
+      <button (click)="confirmData()" class="btn-submit">✅ Confirm & Continue</button>
+    </div>
+  </div>
+
+  <!-- STEP: PURPOSE -->
   <div *ngIf="currentStep === 'purpose'" class="fade-in">
     <h2>Hello, {{ visitorData?.full_name }}!</h2>
     <p>What is the purpose of your visit today?</p>
-
     <div class="purpose-grid">
-      <button *ngFor="let p of purposes" (click)="selectPurpose(p)" class="btn-purpose">
-        {{ p }}
-      </button>
+      <button *ngFor="let p of purposes" (click)="selectPurpose(p)" class="btn-purpose">{{ p }}</button>
     </div>
-
-    <button (click)="resetKiosk()" class="btn-link">
-      Cancel and Start Over
-    </button>
+    <button (click)="resetKiosk()" class="btn-link">Cancel and Start Over</button>
   </div>
 
-  <div *ngIf="currentStep === 'ticket'" class="fade-in" id="printable-pass-container">
+  <!-- STEP: TICKET -->
+  <div *ngIf="currentStep === 'ticket'" class="fade-in">
     <div class="visitor-pass" id="printable-pass">
       <h3>VISITOR PASS</h3>
-
       <div class="pass-details">
         <p><strong>NAME:</strong> {{ visitorData?.full_name }}</p>
+        <p><strong>BIRTHDAY:</strong> {{ visitorData?.birthday }}</p>
         <p><strong>ID TYPE:</strong> {{ selectedIdType }}</p>
+        <p><strong>ID NUMBER:</strong> {{ visitorData?.id_number }}</p>
         <p><strong>PURPOSE:</strong> {{ selectedPurpose }}</p>
-        <p><strong>TIME:</strong> {{ visitorData?.time_in }}</p>
+        <p><strong>TIME IN:</strong> {{ visitorData?.time_in }}</p>
         <p><strong>CONTROL #:</strong> {{ visitorData?.control_no }}</p>
       </div>
-
       <div class="qr-container">
+        <p class="qr-label">Scan at Exit Gate</p>
         <img *ngIf="qrCodeImage" [src]="qrCodeImage" alt="Exit QR Code" class="qr-code-img">
       </div>
-
       <div class="pass-actions no-print">
-        <button (click)="printPass()" class="btn-print">PRINT RECEIPT</button>
-        <button (click)="resetKiosk()" class="btn-done-final">DONE</button>
+        <button (click)="printPass()" class="btn-print">🖨️ PRINT RECEIPT</button>
+        <button (click)="resetKiosk()" class="btn-done-final">✅ DONE</button>
       </div>
     </div>
   </div>

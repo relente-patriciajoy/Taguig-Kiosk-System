@@ -9,7 +9,6 @@
 
 .kiosk-header h1 {
   color: #d32f2f;
-  /* Taguig Red */
   margin-bottom: 5px;
   letter-spacing: 1px;
 }
@@ -20,48 +19,327 @@
   text-transform: uppercase;
 }
 
-/* --- Navigation & Icons --- */
-.icon-container {
-  margin: 40px 0;
+/* --- Global Loading Overlay --- */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  color: white;
 }
 
-.id-icon {
-  font-size: 100px;
+.loading-spinner {
+  width: 56px;
+  height: 56px;
+  border: 6px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin-bottom: 16px;
 }
 
-.btn-link {
+.loading-message {
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Camera Viewfinder --- */
+.camera-container {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  height: 360px;
+  margin: 20px auto;
+  background: #000;
+  border-radius: 15px;
+  overflow: hidden;
+  border: 4px solid #d32f2f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.video-feed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.video-hidden {
+  display: none;
+}
+
+.canvas-hidden {
+  display: none;
+}
+
+/* --- Captured snapshot --- */
+.captured-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.captured-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(46, 125, 50, 0.9);
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+/* --- Scan Guide Overlay --- */
+.scan-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 88%;
+  height: 75%;
+  pointer-events: none;
+}
+
+.scan-guide-text {
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  white-space: nowrap;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+.corner {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border: 4px solid #fff;
+}
+
+.top-left {
+  top: 0;
+  left: 0;
+  border-right: none;
+  border-bottom: none;
+}
+
+.top-right {
+  top: 0;
+  right: 0;
+  border-left: none;
+  border-bottom: none;
+}
+
+.bottom-left {
+  bottom: 0;
+  left: 0;
+  border-right: none;
+  border-top: none;
+}
+
+.bottom-right {
+  bottom: 0;
+  right: 0;
+  border-left: none;
+  border-top: none;
+}
+
+/* --- Camera Error Overlays --- */
+.camera-error-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  z-index: 10;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.overlay-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.overlay-hint {
+  font-size: 13px;
+  opacity: 0.75;
+  margin-top: 4px;
+  line-height: 1.6;
+}
+
+/* --- Capture Buttons --- */
+.capture-actions {
   margin-top: 20px;
-  background: none;
-  border: none;
-  color: #777;
-  cursor: pointer;
-  text-decoration: underline;
 }
 
-/* --- Main Action Buttons --- */
-.btn-scan {
-  padding: 20px 60px;
-  font-size: 22px;
-  cursor: pointer;
-  background-color: #d32f2f;
+.btn-capture {
+  background: #d32f2f;
   color: white;
   border: none;
-  border-radius: 50px;
-  box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3);
-  transition: transform 0.2s, background-color 0.2s;
+  padding: 16px 40px;
+  border-radius: 10px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
 }
 
-.btn-scan:hover:not(:disabled) {
-  background-color: #b71c1c;
-  transform: scale(1.05);
+.btn-capture:hover:not(:disabled) {
+  background: #b71c1c;
+  transform: translateY(-2px);
 }
 
-.btn-scan:disabled {
-  background-color: #ccc;
+.btn-capture:disabled {
+  background: #bdbdbd;
   cursor: not-allowed;
 }
 
-/* --- Selection Grids (ID & Purpose) --- */
+.confirm-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-retake {
+  padding: 14px 24px;
+  background: white;
+  color: #333;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-retake:hover {
+  background: #f5f5f5;
+}
+
+.btn-confirm-capture {
+  padding: 14px 28px;
+  background: #2e7d32;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.btn-confirm-capture:hover {
+  background: #1b5e20;
+  transform: translateY(-2px);
+}
+
+/* --- Confirm Info Card --- */
+.confirm-card {
+  max-width: 520px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 16px;
+  border: 2px solid #e0e0e0;
+  padding: 32px 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.confirm-header {
+  margin-bottom: 24px;
+}
+
+.confirm-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+  text-align: left;
+  gap: 16px;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.info-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #212121;
+  text-align: right;
+}
+
+/* --- Retry Button --- */
+.btn-retry {
+  background: #d32f2f;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.btn-retry--dark {
+  background: #555;
+  margin-top: 8px;
+}
+
+/* --- ID Icon --- */
+.id-icon {
+  font-size: 80px;
+  display: block;
+  margin-bottom: 20px;
+}
+
+/* --- Purpose Grid --- */
 .purpose-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -79,34 +357,36 @@
   border-radius: 10px;
   cursor: pointer;
   font-weight: bold;
-  transition: all 0.2s;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .btn-purpose:hover {
-  background-color: #d32f2f;
-  color: white;
+  background: #fbe9e7;
+  transform: translateY(-2px);
 }
 
-/* --- Visitor Pass & QR Section --- */
+.btn-purpose:active {
+  transform: translateY(0);
+}
+
+/* --- Visitor Pass --- */
 .visitor-pass {
   max-width: 400px;
   margin: 20px auto;
   border: 2px solid #333;
   padding: 30px;
   background: #fff;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .pass-details {
   text-align: left;
   margin: 20px 0;
-  line-height: 1.6;
+  line-height: 1.8;
 }
 
-.qr-container {
-  margin: 20px 0;
-  display: flex;
-  justify-content: center;
+.qr-label {
+  font-size: 13px;
+  color: #555;
 }
 
 .qr-code-img {
@@ -116,11 +396,10 @@
   padding: 10px;
 }
 
-/* --- Final Action Buttons --- */
 .pass-actions {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  justify-content: center;
   margin-top: 20px;
 }
 
@@ -132,11 +411,6 @@
   border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
-  transition: 0.2s;
-}
-
-.btn-print:hover {
-  background-color: #f9f9f9;
 }
 
 .btn-done-final {
@@ -147,6 +421,16 @@
   border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
+}
+
+.btn-link {
+  display: block;
+  margin-top: 20px;
+  background: none;
+  border: none;
+  color: #777;
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 /* --- Animations --- */
@@ -166,30 +450,25 @@
   }
 }
 
-/* --- Print Settings --- */
+/* --- Print --- */
 @media print {
   @page {
     margin: 0;
   }
 
-  /* 1. Completely remove background elements from the print layout */
   .kiosk-header,
   .btn-link,
-  .icon-container {
+  .icon-container,
+  .no-print {
     display: none !important;
   }
 
-  /* 2. Reset the body to center everything */
   body {
     margin: 0;
     padding: 0;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: flex-start !important;
     background-color: white;
   }
 
-  /* 3. Force the pass to be the only thing visible and centered */
   body * {
     visibility: hidden;
   }
@@ -198,47 +477,187 @@
   #printable-pass * {
     visibility: visible;
     display: block;
-    /* Ensures elements stack vertically */
   }
 
   #printable-pass {
     position: static;
-    /* Let flexbox handle positioning */
     width: 300px;
-    /* Typical width for an 80mm thermal printer */
     margin: 0 auto;
     border: none;
     box-shadow: none;
     padding: 20px;
     text-align: center;
-    /* Centers all text within the pass */
-  }
-
-  /* 4. Center the QR image specifically */
-  .qr-container {
-    display: flex !important;
-    justify-content: center !important;
-    margin: 15px 0 !important;
   }
 
   .qr-code-img {
-    width: 180px !important;
-    height: 180px !important;
-    display: block !important;
-    margin: 0 auto !important;
-  }
-
-  /* 5. Clean up details list */
-  .pass-details {
-    text-align: left;
-    /* Keep text aligned left for readability */
-    display: inline-block;
-    /* Allows the container to be centered */
+    width: 180px;
+    height: 180px;
     margin: 0 auto;
   }
 
-  /* 6. Hide buttons on receipt */
-  .no-print {
-    display: none !important;
+  .pass-details {
+    text-align: left;
+    display: inline-block;
+    margin: 0 auto;
   }
+}
+
+/* --- Capture Flow --- */
+.scan-instruction {
+  color: #555;
+  margin: 10px 0 16px;
+  font-size: 15px;
+}
+
+.btn-capture {
+  background: #d32f2f;
+  color: white;
+  border: none;
+  padding: 16px 40px;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.btn-capture:hover {
+  background: #b71c1c;
+  transform: scale(1.03);
+}
+
+.captured-actions {
+  margin-top: 16px;
+}
+
+.action-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.btn-retake {
+  padding: 14px 24px;
+  background: white;
+  color: #333;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-retake:hover {
+  background: #f5f5f5;
+}
+
+.btn-submit {
+  padding: 14px 28px;
+  background: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-submit:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+.btn-submit:not(:disabled):hover {
+  background: #b71c1c;
+}
+
+/* --- Captured photo preview inside camera box --- */
+.captured-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* --- ID placement guide overlay --- */
+.id-guide-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.id-guide-box {
+  position: relative;
+  width: 380px;
+  height: 240px;
+}
+
+.guide-label {
+  color: white;
+  font-size: 13px;
+  margin-top: 12px;
+  font-weight: bold;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* --- Info preview card --- */
+.info-card {
+  max-width: 500px;
+  margin: 0 auto 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 14px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+}
+
+.id-thumbnail-wrapper {
+  background: #000;
+  text-align: center;
+  padding: 10px;
+}
+
+.id-thumbnail {
+  max-height: 160px;
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.info-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #222;
 }
