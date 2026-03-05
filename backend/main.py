@@ -139,20 +139,52 @@ def parse_philsys(ocr_lines: list) -> dict:
     for i, line in enumerate(lines):
         ll = line.lower()
 
-        if not last_name and ('apelyido' in ll or 'last name' in ll):
-            last_name = get_next_value(lines, i)
+        # ── Last Name ──────────────────────────────────────────────────────
+        # Matches: "Apelyido/Last Name", "Apelyido", "Last Name"
+        # Also handles inline: "Apelyido/Last Name DELA CRUZ"
+        if not last_name and ('apelyido' in ll or 'last name' in ll) and 'gitnang' not in ll:
+            # Try inline first — value after the slash or label
+            inline = re.split(r'(?:apelyido|last name)[^a-z]*', ll, flags=re.IGNORECASE)
+            inline_val = inline[-1].strip() if len(inline) > 1 else ''
+            if inline_val and len(inline_val) > 1:
+                last_name = line.split()[-len(inline_val.split()):]
+                last_name = ' '.join(last_name).title()
+            else:
+                last_name = get_next_value(lines, i)
 
-        elif not first_name and ('mga pangalan' in ll or 'given name' in ll):
-            first_name = get_next_value(lines, i)
+        # ── First Name ─────────────────────────────────────────────────────
+        # Matches: "Mga Pangalan/Given Names", "Mga Pangalan", "Given Name"
+        elif not first_name and ('mga pangalan' in ll or 'given name' in ll or 'pangalan' in ll):
+            inline = re.split(r'(?:mga pangalan|given names?|pangalan)[^a-z]*', ll, flags=re.IGNORECASE)
+            inline_val = inline[-1].strip() if len(inline) > 1 else ''
+            if inline_val and len(inline_val) > 1:
+                first_name = line.split()[-len(inline_val.split()):]
+                first_name = ' '.join(first_name).title()
+            else:
+                first_name = get_next_value(lines, i)
 
+        # ── Middle Name ────────────────────────────────────────────────────
+        # Matches: "Gitnang Apelyido/Middle Name", "Middle Name"
         elif not middle_name and ('gitnang apelyido' in ll or 'middle name' in ll):
-            middle_name = get_next_value(lines, i)
+            inline = re.split(r'(?:gitnang apelyido|middle name)[^a-z]*', ll, flags=re.IGNORECASE)
+            inline_val = inline[-1].strip() if len(inline) > 1 else ''
+            if inline_val and len(inline_val) > 1:
+                middle_name = line.split()[-len(inline_val.split()):]
+                middle_name = ' '.join(middle_name).title()
+            else:
+                middle_name = get_next_value(lines, i)
 
+        # ── Birthday ───────────────────────────────────────────────────────
         elif not birthday and ('petsa ng kapanganakan' in ll or 'date of birth' in ll):
-            birthday = get_next_value(lines, i)
+            inline = re.split(r'(?:petsa ng kapanganakan|date of birth)[^a-z]*', ll, flags=re.IGNORECASE)
+            inline_val = inline[-1].strip() if len(inline) > 1 else ''
+            if inline_val and len(inline_val) > 1:
+                birthday = inline_val.title()
+            else:
+                birthday = get_next_value(lines, i)
 
+        # ── Address ────────────────────────────────────────────────────────
         elif not address and ('tirahan' in ll or ll.strip() == 'address'):
-            # Address may span 2 lines — collect both
             val1 = get_next_value(lines, i)
             val2 = ''
             if val1:
@@ -266,6 +298,185 @@ def parse_generic_id(ocr_lines: list, id_type: str) -> dict:
         "id_number": id_number  or "Not detected",
         "birthday":  birthday   or "Not detected",
     }
+
+
+import urllib.request
+from fastapi.responses import StreamingResponse, Response
+
+# ── UPDATE THIS to your phone's IP Webcam address ─────────────────────────
+PHONE_IP = "100.84.212.250"
+PHONE_PORT = "8080"
+PHONE_BASE = f"http://{PHONE_IP}:{PHONE_PORT}"
+# ──────────────────────────────────────────────────────────────────────────
+
+@app.get("/proxy/video")
+async def proxy_video():
+    """Proxies the MJPEG stream — passes through exact content-type from phone."""
+    try:
+        req = urllib.request.Request(f"{PHONE_BASE}/video")
+        response = urllib.request.urlopen(req, timeout=30)
+        content_type = response.headers.get("Content-Type", "multipart/x-mixed-replace; boundary=--BoundaryString")
+        print(f"Phone content-type: {content_type}")
+
+        def generate():
+            try:
+                while True:
+                    chunk = response.read(4096)
+                    if not chunk:
+                        break
+                    yield chunk
+            except Exception as e:
+                print(f"Stream error: {e}")
+
+        return StreamingResponse(
+            generate(),
+            media_type=content_type,
+            headers={
+                "Cache-Control": "no-cache, no-store",
+                "Access-Control-Allow-Origin": "*",
+            }
+        )
+    except Exception as e:
+        print(f"Video proxy error: {e}")
+        return Response(content=b"", status_code=502)
+
+
+@app.get("/proxy/shot")
+async def proxy_shot():
+    """Returns a single JPEG frame from the phone camera."""
+    try:
+        req = urllib.request.Request(
+            f"{PHONE_BASE}/shot.jpg",
+            headers={"Cache-Control": "no-cache"}
+        )
+        with urllib.request.urlopen(req, timeout=5) as response:
+            data = response.read()
+        return Response(
+            content=data,
+            media_type="image/jpeg",
+            headers={"Access-Control-Allow-Origin": "*"}
+        )
+    except Exception as e:
+        print(f"Shot proxy error: {e}")
+        return Response(content=b"", status_code=502)
+
+
+class AnalyzeRequest(BaseModel):
+    image_base64: str
+
+
+@app.post("/analyze-frame")
+async def analyze_frame(req: AnalyzeRequest):
+    """
+    Analyzes a single camera frame and returns real-time feedback.
+    Returns: status, message, and whether auto-capture should trigger.
+    """
+    try:
+        img_data = base64.b64decode(req.image_base64)
+        image = Image.open(io.BytesIO(img_data)).convert("RGB")
+        img_array = np.array(image)
+
+        h, w = img_array.shape[:2]
+        gray = cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
+
+        # ── 1. Blur Detection ──────────────────────────────────────────────
+        # Laplacian variance — low value = blurry image
+        lap_var = cv2.Laplacian(gray, cv2.CV_64F).var()
+        is_blurry = lap_var < 40  # lowered — white IDs naturally score lower
+
+        # ── 2. ID Detection ────────────────────────────────────────────────
+        # Enhance contrast first — helps detect white IDs on light backgrounds
+        clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
+        enhanced = clahe.apply(gray)
+
+        # Use multiple Canny thresholds to catch both dark and light edges
+        edges1 = cv2.Canny(enhanced, 30, 100)
+        edges2 = cv2.Canny(enhanced, 10, 50)
+        edges = cv2.bitwise_or(edges1, edges2)
+
+        # Dilate edges to connect nearby lines
+        kernel = np.ones((3,3), np.uint8)
+        edges = cv2.dilate(edges, kernel, iterations=1)
+
+        contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        id_detected = False
+        id_too_close = False
+        id_too_far = False
+        id_area_ratio = 0.0
+
+        best_rect = None
+        best_area = 0
+
+        for cnt in contours:
+            area = cv2.contourArea(cnt)
+            if area < (w * h * 0.03):  # skip tiny contours
+                continue
+            peri = cv2.arcLength(cnt, True)
+            approx = cv2.approxPolyDP(cnt, 0.03 * peri, True)
+
+            # Accept 4-sided shapes OR bounding rects that look like ID cards
+            x, y, cw, ch = cv2.boundingRect(cnt)
+            aspect = cw / ch if ch > 0 else 0
+
+            # ID card aspect ratio ~1.58, allow some tolerance
+            if 1.2 <= aspect <= 2.2 and area > best_area:
+                rect_area = cw * ch
+                fill_ratio = area / rect_area if rect_area > 0 else 0
+                # Must fill at least 40% of its bounding box (filters noise)
+                if fill_ratio > 0.25:
+                    best_area = area
+                    best_rect = (x, y, cw, ch)
+
+        if best_rect:
+            id_detected = True
+            x, y, cw, ch = best_rect
+            id_area_ratio = (cw * ch) / (w * h)
+
+            if id_area_ratio > 0.88:
+                id_too_close = True
+            elif id_area_ratio < 0.15:
+                id_too_far = True
+
+        # ── 3. Determine overall status ───────────────────────────────────
+        if not id_detected:
+            status = "no_id"
+            message = "No ID detected — place your ID in the frame"
+            ready = False
+
+        elif id_too_far:
+            status = "too_far"
+            message = "Move your ID closer"
+            ready = False
+
+        elif id_too_close:
+            status = "too_close"
+            message = "Move your ID further back"
+            ready = False
+
+        elif is_blurry:
+            status = "blurry"
+            message = "Hold steady — image is blurry"
+            ready = False
+
+        else:
+            status = "good"
+            message = "Looks good!"
+            ready = True
+
+        return {
+            "status": status,
+            "message": message,
+            "ready": ready,
+            "debug": {
+                "blur_score": round(lap_var, 1),
+                "id_area_ratio": round(id_area_ratio, 2),
+                "id_detected": id_detected,
+            }
+        }
+
+    except Exception as e:
+        return {"status": "error", "message": "Analysis failed", "ready": False}
 
 
 @app.post("/capture-id")
