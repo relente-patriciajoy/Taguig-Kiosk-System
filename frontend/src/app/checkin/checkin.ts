@@ -50,9 +50,10 @@ export class CheckinComponent implements OnDestroy {
   private countdownActive = false;
 
   // ── Phone camera config ───────────────────────────────────────────────────
-  usePhoneCamera = true;
+  usePhoneCamera = false;
   readonly PHONE_CAMERA_URL = 'http://6.3.51.188:8080/video';   // direct phone stream
   readonly PHONE_SHOT_URL = 'http://6.3.51.188:8080/shot.jpg'; // direct snapshot
+
   // ─────────────────────────────────────────────────────────────────────────
 
   idTypes = [
