@@ -1,0 +1,85 @@
+<div class="checkout-wrapper">
+
+  <nav class="top-nav">
+    <div class="nav-brand">
+      <div class="nav-title-group">
+        <span class="nav-city">CITY GOVERNMENT OF TAGUIG</span>
+        <span class="nav-subtitle">Visitor Management System</span>
+      </div>
+    </div>
+    <button (click)="goHome()" class="nav-btn">🏠 Home</button>
+  </nav>
+
+  <div class="checkout-container">
+
+    <!-- SCAN STEP -->
+    <div *ngIf="currentStep === 'scan'" class="fade-in">
+      <div class="checkout-header">
+        <span class="checkout-icon">🚪</span>
+        <h1>CHECK-OUT</h1>
+        <p>Enter your Control Number from your visitor pass to log your exit.</p>
+      </div>
+
+      <div class="input-card">
+        <label class="input-label">Control Number</label>
+        <input
+          type="text"
+          class="control-input"
+          placeholder="e.g. TGK-20260305-AB12C"
+          [value]="manualInput"
+          (input)="onInputChange($event)"
+          (keyup.enter)="submitManual()">
+
+        <p *ngIf="error" class="error-msg">⚠️ {{ error }}</p>
+
+        <button
+          (click)="submitManual()"
+          class="btn-submit"
+          [disabled]="loading || !manualInput">
+          <span *ngIf="!loading">✅ Confirm Check-Out</span>
+          <span *ngIf="loading">⏳ Processing...</span>
+        </button>
+      </div>
+
+      <button (click)="goHome()" class="btn-link">← Back to Home</button>
+    </div>
+
+    <!-- RESULT STEP -->
+    <div *ngIf="currentStep === 'result'" class="fade-in">
+      <div class="result-card">
+        <div class="result-icon">✅</div>
+        <h2>Check-Out Successful!</h2>
+        <p class="result-sub">Thank you for visiting Taguig City Hall.</p>
+
+        <div class="result-details">
+          <div class="result-row">
+            <span class="result-label">Name</span>
+            <span class="result-value">{{ visitorData?.full_name }}</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Control #</span>
+            <span class="result-value">{{ visitorData?.control_no }}</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Purpose</span>
+            <span class="result-value">{{ visitorData?.purpose }}</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Time In</span>
+            <span class="result-value">{{ visitorData?.time_in }}</span>
+          </div>
+          <div class="result-row highlight">
+            <span class="result-label">Time Out</span>
+            <span class="result-value">{{ visitorData?.time_out }}</span>
+          </div>
+        </div>
+
+        <div class="result-actions">
+          <button (click)="reset()" class="btn-another">Check Out Another Visitor</button>
+          <button (click)="goHome()" class="btn-home">🏠 Back to Home</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
