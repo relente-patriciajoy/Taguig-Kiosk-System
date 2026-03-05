@@ -1,0 +1,81 @@
+<div class="landing-wrapper">
+
+  <nav class="top-nav">
+    <div class="nav-brand">
+      <img src="assets/taguig-logo.png" alt="Taguig Logo" class="nav-logo"
+           onerror="this.style.display='none'">
+      <div class="nav-title-group">
+        <span class="nav-city">CITY GOVERNMENT OF TAGUIG</span>
+        <span class="nav-subtitle">Visitor Management System</span>
+      </div>
+    </div>
+    <div class="nav-clock">
+      <span class="clock-time">{{ currentTime | date:'hh:mm:ss a' }}</span>
+      <span class="clock-date">{{ currentTime | date:'MMMM d, yyyy' }}</span>
+    </div>
+    <div class="nav-links">
+      <button (click)="goToCheckin()"  class="nav-btn nav-btn-checkin">🏛️ Check-In</button>
+      <button (click)="goToCheckout()" class="nav-btn nav-btn-checkout">🚪 Check-Out</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="hero-bg-circle circle-1"></div>
+      <div class="hero-bg-circle circle-2"></div>
+    </div>
+    <div class="hero-content">
+      <p class="hero-tagline">TRANSFORMATIVE · LIVELY · CARING</p>
+      <h1 class="hero-title">
+        <span class="title-welcome">WELCOME TO THE</span>
+        <span class="title-city">CITY OF</span>
+        <span class="title-taguig">TAGUIG</span>
+      </h1>
+      <p class="hero-desc">Please select your transaction below to get started.</p>
+
+      <div class="action-cards">
+
+        <div class="action-card checkin-card" (click)="goToCheckin()">
+          <div class="card-icon-wrap checkin-icon-wrap">🏛️</div>
+          <h2 class="card-title">CHECK-IN</h2>
+          <p class="card-desc">
+            Register your visit by scanning your government-issued ID.
+            Receive a visitor pass with QR code for exit.
+          </p>
+          <div class="card-steps">
+            <span class="step">① Select ID</span>
+            <span class="arrow">→</span>
+            <span class="step">② Scan ID</span>
+            <span class="arrow">→</span>
+            <span class="step">③ Get Pass</span>
+          </div>
+          <button class="card-btn checkin-btn">START CHECK-IN →</button>
+        </div>
+
+        <div class="action-card checkout-card" (click)="goToCheckout()">
+          <div class="card-icon-wrap checkout-icon-wrap">🚪</div>
+          <h2 class="card-title">CHECK-OUT</h2>
+          <p class="card-desc">
+            Enter your control number from your visitor pass
+            to log your exit from the building.
+          </p>
+          <div class="card-steps">
+            <span class="step">① Get Pass</span>
+            <span class="arrow">→</span>
+            <span class="step">② Enter #</span>
+            <span class="arrow">→</span>
+            <span class="step">③ Exit</span>
+          </div>
+          <button class="card-btn checkout-btn">START CHECK-OUT →</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="landing-footer">
+    <p>© {{ currentTime | date:'yyyy' }} City Government of Taguig &nbsp;·&nbsp; Visitor Kiosk System</p>
+    <p class="footer-sub">For assistance, please approach the nearest security personnel.</p>
+  </footer>
+
+</div>
