@@ -10,12 +10,22 @@ import { Router } from '@angular/router';
   styleUrl: './landing.css'
 })
 export class LandingComponent {
+
+  // Properties
   currentTime = new Date();
 
+  // Constructor
   constructor(private router: Router) {
     setInterval(() => { this.currentTime = new Date(); }, 1000);
   }
 
-  goToCheckin(): void { this.router.navigate(['/checkin']); }
-  goToCheckout(): void { this.router.navigate(['/checkout']); }
+  // Methods
+  goToCheckin(): void {
+    this.router.navigate(['/checkin']);
+  }
+
+  goToCheckout(): void {
+    this.router.navigate(['/checkout']);
+  }
+
 }
