@@ -7,6 +7,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { VisitorService } from '../visitor.service';
 
 type ScanStep = 'home' | 'scan' | 'preview' | 'purpose' | 'ticket';
@@ -14,14 +15,14 @@ type CameraState = 'initializing' | 'ready' | 'captured' | 'error-permission' | 
 type FrameStatus = 'no_id' | 'too_far' | 'too_close' | 'blurry' | 'good' | 'idle';
 
 @Component({
-  selector: 'app-root',
+  selector: 'app-checkin',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './checkin.html',
   styleUrl: './checkin.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppComponent implements OnDestroy {
+export class CheckinComponent implements OnDestroy {
 
   @ViewChild('videoEl') videoEl!: ElementRef<HTMLVideoElement>;
   @ViewChild('canvasEl') canvasEl!: ElementRef<HTMLCanvasElement>;
@@ -50,8 +51,8 @@ export class AppComponent implements OnDestroy {
 
   // ── Phone camera config ───────────────────────────────────────────────────
   usePhoneCamera = true;
-  readonly PHONE_CAMERA_URL = 'http://100.84.212.250:8080/video';   // direct phone stream
-  readonly PHONE_SHOT_URL = 'http://100.84.212.250:8080/shot.jpg'; // direct snapshot
+  readonly PHONE_CAMERA_URL = 'http://6.3.51.188:8080/video';   // direct phone stream
+  readonly PHONE_SHOT_URL = 'http://6.3.51.188:8080/shot.jpg'; // direct snapshot
   // ─────────────────────────────────────────────────────────────────────────
 
   idTypes = [
@@ -82,6 +83,7 @@ export class AppComponent implements OnDestroy {
 
   constructor(
     private visitorService: VisitorService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -453,6 +455,8 @@ export class AppComponent implements OnDestroy {
   }
 
   printPass(): void { window.print(); }
+
+  goHome(): void { this.router.navigate(['/']); }
 
   resetKiosk(): void {
     this.stopAll();
