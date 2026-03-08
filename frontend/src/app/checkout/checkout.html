@@ -1,26 +1,75 @@
-<div class="checkout-wrapper">
+<div class="checkout-wrap">
 
-  <nav class="top-nav">
+  <!-- Nav -->
+  <nav class="nav-bar">
     <div class="nav-brand">
-      <div class="nav-title-group">
-        <span class="nav-city">CITY GOVERNMENT OF TAGUIG</span>
-        <span class="nav-subtitle">Visitor Management System</span>
+      <img src="taguig-logo.png" alt="Taguig Logo" class="nav-logo"
+           onerror="this.style.display='none'">
+      <div class="nav-info">
+        <span class="nav-title">City Government of Taguig</span>
+        <span class="nav-sub">Visitor Management System</span>
       </div>
     </div>
-    <button (click)="goHome()" class="nav-btn">🏠 Home</button>
+    <button (click)="goHome()" class="btn-home-nav">🏠 Home</button>
   </nav>
 
-  <div class="checkout-container">
+  <div class="checkout-body">
 
-    <!-- SCAN STEP -->
+    <!-- ── STEP: SCAN ── -->
     <div *ngIf="currentStep === 'scan'" class="fade-in">
-      <div class="checkout-header">
-        <span class="checkout-icon">🚪</span>
-        <h1>CHECK-OUT</h1>
-        <p>Enter your Control Number from your visitor pass to log your exit.</p>
+
+      <div class="page-header">
+        <div class="header-icon">🚪</div>
+        <h1 class="page-title">CHECK-OUT</h1>
+        <p class="page-desc">Scan your visitor pass QR code or enter your control number manually.</p>
       </div>
 
-      <div class="input-card">
+      <!-- Mode Toggle -->
+      <div class="mode-toggle">
+        <button
+          class="mode-btn"
+          [class.mode-active]="inputMode === 'scanner'"
+          (click)="setMode('scanner')">
+          📷 Scan QR / Barcode
+        </button>
+        <button
+          class="mode-btn"
+          [class.mode-active]="inputMode === 'manual'"
+          (click)="setMode('manual')">
+          ⌨️ Type Manually
+        </button>
+      </div>
+
+      <!-- Scanner Mode -->
+      <div *ngIf="inputMode === 'scanner'" class="input-card">
+        <div class="scanner-area" [class.scanner-waiting]="scannerReady" [class.scanner-processing]="loading">
+
+          <div *ngIf="scannerReady && !loading" class="scanner-idle">
+            <div class="scanner-icon-wrap">
+              <span class="scanner-icon">📷</span>
+              <div class="scan-line"></div>
+            </div>
+            <p class="scanner-label">Point the barcode scanner at the QR code</p>
+            <p class="scanner-hint">The scanner will auto-submit once the code is read</p>
+          </div>
+
+          <div *ngIf="loading" class="scanner-processing-wrap">
+            <div class="spinner"></div>
+            <p class="scanner-label">Processing check-out...</p>
+          </div>
+
+        </div>
+
+        <p *ngIf="error" class="error-msg">⚠️ {{ error }}</p>
+
+        <p class="switch-hint">
+          No scanner? &nbsp;
+          <button (click)="setMode('manual')" class="btn-text-link">Type manually instead →</button>
+        </p>
+      </div>
+
+      <!-- Manual Mode -->
+      <div *ngIf="inputMode === 'manual'" class="input-card">
         <label class="input-label">Control Number</label>
         <input
           type="text"
@@ -28,7 +77,8 @@
           placeholder="e.g. TGK-20260305-AB12C"
           [value]="manualInput"
           (input)="onInputChange($event)"
-          (keyup.enter)="submitManual()">
+          (keyup.enter)="submitManual()"
+          autofocus>
 
         <p *ngIf="error" class="error-msg">⚠️ {{ error }}</p>
 
@@ -39,16 +89,19 @@
           <span *ngIf="!loading">✅ Confirm Check-Out</span>
           <span *ngIf="loading">⏳ Processing...</span>
         </button>
-      </div>
 
-      <button (click)="goHome()" class="btn-link">← Back to Home</button>
+        <p class="switch-hint">
+          Have a scanner? &nbsp;
+          <button (click)="setMode('scanner')" class="btn-text-link">Switch to scan mode →</button>
+        </p>
+      </div>
     </div>
 
-    <!-- RESULT STEP -->
+    <!-- ── STEP: RESULT ── -->
     <div *ngIf="currentStep === 'result'" class="fade-in">
       <div class="result-card">
         <div class="result-icon">✅</div>
-        <h2>Check-Out Successful!</h2>
+        <h2 class="result-title">Check-Out Successful!</h2>
         <p class="result-sub">Thank you for visiting Taguig City Hall.</p>
 
         <div class="result-details">
@@ -76,7 +129,7 @@
 
         <div class="result-actions">
           <button (click)="reset()" class="btn-another">Check Out Another Visitor</button>
-          <button (click)="goHome()" class="btn-home">🏠 Back to Home</button>
+          <button (click)="goHome()" class="btn-go-home">Back to Home</button>
         </div>
       </div>
     </div>
