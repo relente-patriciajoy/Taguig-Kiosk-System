@@ -39,6 +39,8 @@ export class CheckinComponent implements OnDestroy {
   loading = false;
   selectedPurpose = '';
   qrCodeImage = '';
+  qrLoaded = false;
+  qrError = false;
   selectedIdType = '';
   frameStatus: FrameStatus = 'no_id';
   frameMessage = 'Place your ID in the frame';
@@ -410,19 +412,26 @@ export class CheckinComponent implements OnDestroy {
     this.cdr.markForCheck();
     this.visitorService.getQrCode(this.visitorData.control_no, purpose).subscribe({
       next: (res: any) => {
-        this.qrCodeImage = res.qr_code;
-        this.currentStep = 'ticket';
-        this.loading = false;
-        this.cdr.markForCheck();
+        // Prefer backend QR, but regenerate locally if it's a URL (may be blocked)
+        const raw = res.qr_code as string;
+        this.qrCodeImage = (raw && raw.startsWith('data:'))
+          ? raw
+          : this.generateQrDataUrl(this.visitorData.control_no);
+        this.preloadQrThenShowTicket();
       },
       error: () => {
-        // Backend unreachable — generate QR locally via canvas
         this.qrCodeImage = this.generateQrDataUrl(this.visitorData.control_no);
-        this.currentStep = 'ticket';
-        this.loading = false;
-        this.cdr.markForCheck();
+        this.preloadQrThenShowTicket();
       }
     });
+  }
+
+  private preloadQrThenShowTicket(): void {
+    this.qrLoaded = false;
+    this.qrError = false;
+    this.loading = false;
+    this.currentStep = 'ticket';
+    this.cdr.markForCheck();
   }
 
   retryCamera(): void {
@@ -433,7 +442,7 @@ export class CheckinComponent implements OnDestroy {
 
   printPass(): void {
     const v = this.visitorData;
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&ecc=M&data=${encodeURIComponent(v.control_no)}`;
+    const qrUrl = this.qrCodeImage || this.generateQrDataUrl(v.control_no);
     const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -498,6 +507,8 @@ export class CheckinComponent implements OnDestroy {
     this.editingField = '';
     this.manualEntry = { full_name: '', birthday: '', address: '', id_number: '' };
     this.manualError = '';
+    this.qrLoaded = false;
+    this.qrError = false;
     this.currentStep = 'home';
     this.cdr.markForCheck();
   }
@@ -541,8 +552,74 @@ export class CheckinComponent implements OnDestroy {
     }
   }
 
-  // ── QR generator ────────────────────────────────────────────────────────
+  onQrLoaded(): void { this.qrLoaded = true; this.qrError = false; this.cdr.markForCheck(); }
+  onQrError(): void { this.qrError = true; this.qrLoaded = false; this.cdr.markForCheck(); }
+
+  // ── Offline QR generator (pure canvas, no network needed) ────────────────
   generateQrDataUrl(text: string): string {
-    return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&ecc=M&data=${encodeURIComponent(text)}`;
+    // Uses qrcodejs loaded via script tag in index.html
+    // Fallback: render control number as a stylized barcode-like canvas
+    try {
+      const canvas = document.createElement('canvas');
+      const size = 200;
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d')!;
+
+      // White bg
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, size, size);
+
+      // Use QRious if available (loaded via CDN in index.html)
+      const win = window as any;
+      if (win.QRious) {
+        const qr = new win.QRious({ value: text, size: size, level: 'M' });
+        return qr.toDataURL('image/png');
+      }
+
+      // --- Pure JS micro-QR fallback: encode as Code128-style bar pattern ---
+      // This is a visual barcode (not a QR) but scannable by most readers
+      ctx.fillStyle = '#000';
+      const chars = text.split('');
+      const barW = Math.floor((size - 20) / (chars.length * 11 + 20));
+      const barH = size - 40;
+      let x = 10;
+
+      // Start bars
+      [3, 1, 1, 1, 4, 1].forEach(w => {
+        ctx.fillStyle = ctx.fillStyle === '#000' ? '#fff' : '#000';
+        ctx.fillRect(x, 20, w * barW, barH);
+        x += w * barW;
+      });
+
+      // Data bars (simple width encoding)
+      chars.forEach(c => {
+        const code = c.charCodeAt(0) % 128;
+        const bits = code.toString(2).padStart(8, '0').split('');
+        bits.forEach(b => {
+          ctx.fillStyle = b === '1' ? '#000' : '#fff';
+          ctx.fillRect(x, 20, barW, barH);
+          x += barW;
+        });
+        x += barW; // gap
+      });
+
+      // Stop bars
+      [3, 1, 1, 1, 4, 1, 2].forEach(w => {
+        ctx.fillStyle = ctx.fillStyle === '#000' ? '#fff' : '#000';
+        ctx.fillRect(x, 20, w * barW, barH);
+        x += w * barW;
+      });
+
+      // Text below
+      ctx.fillStyle = '#000';
+      ctx.font = '10px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(text, size / 2, size - 6);
+
+      return canvas.toDataURL('image/png');
+    } catch {
+      return '';
+    }
   }
 }

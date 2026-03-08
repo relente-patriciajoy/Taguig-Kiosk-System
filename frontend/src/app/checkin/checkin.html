@@ -385,8 +385,18 @@
         </div>
         <div class="qr-wrap">
           <p class="qr-label">Scan at Exit Gate</p>
-          <img [src]="qrCodeImage" alt="Exit QR Code" class="qr-img"
-               onerror="this.src='https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl='+encodeURIComponent(this.alt)">
+          <div class="qr-loading-wrap">
+            <img [src]="qrCodeImage" alt="QR Code" class="qr-img"
+                 (load)="onQrLoaded()" (error)="onQrError()"
+                 [class.qr-hidden]="!qrLoaded && !qrError">
+            <div class="qr-placeholder" *ngIf="!qrLoaded && !qrError">
+              <div class="qr-spinner"></div>
+              <p>Loading QR...</p>
+            </div>
+            <div class="qr-missing" *ngIf="qrError">
+              <p>⚠️ QR unavailable — use Control # at exit</p>
+            </div>
+          </div>
         </div>
         <div class="pass-actions no-print">
           <button (click)="printPass()" class="btn-print">🖨️ PRINT RECEIPT</button>
