@@ -5,8 +5,8 @@
     <img src="taguig-logo.png" alt="Taguig Logo" class="header-logo"
          onerror="this.style.display='none'">
     <div class="header-text">
-      <h1 class="header-title">CITY OF TAGUIG</h1>
-      <p class="header-sub">VISITOR MANAGEMENT SYSTEM</p>
+      <h1 class="header-title">LUNGSOD NG TAGUIG</h1>
+      <p class="header-sub">VISITOR KIOSK SYSTEM</p>
     </div>
   </header>
 
@@ -40,10 +40,9 @@
 
   <div class="kiosk-body">
 
-    <!-- ── STEP: HOME (ID Selection) ── -->
+    <!-- ── STEP: HOME ── -->
     <div *ngIf="currentStep === 'home'" class="fade-in">
 
-      <!-- Instructions Banner -->
       <div class="instructions-banner">
         <h2 class="instructions-title">📋 How It Works</h2>
         <div class="instructions-steps">
@@ -81,7 +80,6 @@
         </div>
       </div>
 
-      <!-- ID Selection -->
       <div class="section-label">
         <span class="id-icon">🪪</span>
         <h2>Select your ID type to begin</h2>
@@ -96,105 +94,174 @@
     <!-- ── STEP: SCAN ── -->
     <div *ngIf="currentStep === 'scan'" class="fade-in">
 
-      <div *ngIf="cameraState === 'ready'" class="status-bar" [ngClass]="statusColor">
-        <span class="status-icon">{{ statusIcon }}</span>
-        <span class="status-msg">
-          <ng-container *ngIf="countdownValue > 0; else normalMsg">
-            Capturing in <strong>{{ countdownValue }}</strong>...
-          </ng-container>
-          <ng-template #normalMsg>{{ frameMessage || 'Analyzing...' }}</ng-template>
-        </span>
+      <!-- Scan mode toggle -->
+      <div class="scan-mode-toggle">
+        <button class="mode-btn" [class.mode-active]="scanInputMode === 'camera'" (click)="setScanMode('camera')">
+          📷 Camera Scan
+        </button>
+        <button class="mode-btn" [class.mode-active]="scanInputMode === 'manual'" (click)="setScanMode('manual')">
+          ⌨️ Type Manually
+        </button>
       </div>
 
-      <div class="camera-wrap">
+      <!-- ── Camera Mode ── -->
+      <div *ngIf="scanInputMode === 'camera'">
 
-        <img
-          #phoneImgEl
-          *ngIf="usePhoneCamera && cameraState === 'ready'"
-          [src]="PHONE_CAMERA_URL"
-          class="video-feed"
-          alt="Phone camera stream">
-
-        <video
-          #videoEl
-          autoplay
-          muted
-          playsinline
-          class="video-feed"
-          [class.video-hidden]="usePhoneCamera || cameraState !== 'ready'">
-        </video>
-
-        <canvas #canvasEl class="canvas-hidden"></canvas>
-
-        <img
-          *ngIf="cameraState === 'captured'"
-          [src]="capturedImageUrl"
-          class="captured-preview"
-          alt="Captured ID">
-
-        <div *ngIf="cameraState === 'initializing'" class="cam-overlay">
-          <span class="overlay-icon">⏳</span>
-          <p>Starting camera...</p>
+        <div *ngIf="cameraState === 'ready'" class="status-bar" [ngClass]="statusColor">
+          <span class="status-icon">{{ statusIcon }}</span>
+          <span class="status-msg">
+            <ng-container *ngIf="countdownValue > 0; else normalMsg">
+              Capturing in <strong>{{ countdownValue }}</strong>...
+            </ng-container>
+            <ng-template #normalMsg>{{ frameMessage || 'Analyzing...' }}</ng-template>
+          </span>
         </div>
 
-        <div *ngIf="cameraState === 'error-hardware'" class="cam-overlay">
-          <span class="overlay-icon">📷</span>
-          <p>Camera is currently unavailable.</p>
-          <p class="overlay-hint">Another app may be using the camera.</p>
-          <button (click)="retryCamera()" class="btn-retry">🔄 Retry Camera</button>
-        </div>
+        <div class="camera-wrap">
 
-        <div *ngIf="cameraState === 'error-permission'" class="cam-overlay">
-          <span class="overlay-icon">🚫</span>
-          <p>Camera permission was denied.</p>
-          <p class="overlay-hint">
-            Click the 🔒 icon in the address bar,<br>
-            set Camera to <strong>Allow</strong>, then reload.
-          </p>
-        </div>
+          <img
+            #phoneImgEl
+            *ngIf="usePhoneCamera && cameraState === 'ready'"
+            [src]="PHONE_CAMERA_URL"
+            class="video-feed"
+            alt="Phone camera stream">
 
-        <div *ngIf="cameraState === 'ready'" class="id-guide-overlay">
-          <div class="id-guide-box" [ngClass]="statusColor">
-            <div class="corner top-left"></div>
-            <div class="corner top-right"></div>
-            <div class="corner bottom-left"></div>
-            <div class="corner bottom-right"></div>
+          <video
+            #videoEl
+            autoplay
+            muted
+            playsinline
+            class="video-feed"
+            [class.video-hidden]="usePhoneCamera || cameraState !== 'ready'">
+          </video>
+
+          <canvas #canvasEl class="canvas-hidden"></canvas>
+
+          <img
+            *ngIf="cameraState === 'captured'"
+            [src]="capturedImageUrl"
+            class="captured-preview"
+            alt="Captured ID">
+
+          <div *ngIf="cameraState === 'initializing'" class="cam-overlay">
+            <span class="overlay-icon">⏳</span>
+            <p>Starting camera...</p>
           </div>
-          <p class="guide-label">Align your ID within the box</p>
+
+          <div *ngIf="cameraState === 'error-hardware'" class="cam-overlay">
+            <span class="overlay-icon">📷</span>
+            <p>Camera is currently unavailable.</p>
+            <p class="overlay-hint">Another app may be using the camera.</p>
+            <button (click)="retryCamera()" class="btn-retry">🔄 Retry Camera</button>
+          </div>
+
+          <div *ngIf="cameraState === 'error-permission'" class="cam-overlay">
+            <span class="overlay-icon">🚫</span>
+            <p>Camera permission was denied.</p>
+            <p class="overlay-hint">
+              Click the 🔒 icon in the address bar,<br>
+              set Camera to <strong>Allow</strong>, then reload.
+            </p>
+          </div>
+
+          <!-- ID guide box with corners -->
+          <div *ngIf="cameraState === 'ready'" class="id-guide-overlay">
+            <div class="id-guide-box" [ngClass]="statusColor">
+              <div class="corner top-left"></div>
+              <div class="corner top-right"></div>
+              <div class="corner bottom-left"></div>
+              <div class="corner bottom-right"></div>
+
+              <!-- Animated scan line — shows when ID is detected -->
+              <div class="scan-line-wrap" *ngIf="frameStatus === 'good' || countdownValue > 0">
+                <div class="scan-line"></div>
+              </div>
+
+              <!-- Idle pulse when no ID -->
+              <div class="idle-pulse" *ngIf="frameStatus === 'no_id'"></div>
+            </div>
+            <p class="guide-label">Align your ID within the box</p>
+          </div>
+
+          <!-- Countdown overlay -->
+          <div *ngIf="countdownValue > 0" class="countdown-overlay">
+            <span class="countdown-number">{{ countdownValue }}</span>
+          </div>
+
+          <!-- Captured badge -->
+          <div *ngIf="cameraState === 'captured'" class="captured-badge">
+            ✅ Photo Taken
+          </div>
         </div>
 
-        <div *ngIf="countdownValue > 0" class="countdown-overlay">
-          <span class="countdown-number">{{ countdownValue }}</span>
+        <h2 class="scan-title">Scanning: {{ selectedIdType }}</h2>
+
+        <p *ngIf="cameraState === 'ready'" class="scan-hint">
+          Hold your ID flat and steady inside the guide box.<br>
+          The camera will capture automatically when ready.
+        </p>
+
+        <button
+          *ngIf="cameraState === 'ready'"
+          (click)="captureID()"
+          class="btn-capture">
+          📷 Capture Manually
+        </button>
+
+        <div *ngIf="cameraState === 'captured'" class="action-row">
+          <p class="scan-hint">Is your ID clearly visible in the photo?</p>
+          <div class="btn-row">
+            <button (click)="retakePhoto()" class="btn-retake">↩ Retake</button>
+            <button (click)="submitCapture()" class="btn-submit" [disabled]="loading">
+              <span *ngIf="!loading">✅ Looks Good — Submit</span>
+              <span *ngIf="loading">⏳ Reading ID...</span>
+            </button>
+          </div>
         </div>
 
-        <div *ngIf="cameraState === 'captured'" class="captured-badge">
-          Photo Taken
-        </div>
       </div>
 
-      <h2 class="scan-title">Scanning: {{ selectedIdType }}</h2>
+      <!-- ── Manual Type Mode ── -->
+      <div *ngIf="scanInputMode === 'manual'" class="manual-entry-card fade-in">
+        <p class="manual-desc">
+          Enter the details from your ID manually.<br>
+          All fields marked <span class="required-mark">*</span> are required.
+        </p>
 
-      <p *ngIf="cameraState === 'ready'" class="scan-hint">
-        Hold your ID flat and steady inside the guide box.<br>
-        The camera will capture automatically when ready.
-      </p>
-
-      <button
-        *ngIf="cameraState === 'ready'"
-        (click)="captureID()"
-        class="btn-capture">
-        📷 Capture Manually
-      </button>
-
-      <div *ngIf="cameraState === 'captured'" class="action-row">
-        <p class="scan-hint">Is your ID clearly visible in the photo?</p>
-        <div class="btn-row">
-          <button (click)="retakePhoto()" class="btn-retake">↩ Retake</button>
-          <button (click)="submitCapture()" class="btn-submit" [disabled]="loading">
-            <span *ngIf="!loading">Looks Good — Submit</span>
-            <span *ngIf="loading">⏳ Reading ID...</span>
-          </button>
+        <div class="field-group">
+          <label class="field-label">Full Name <span class="required-mark">*</span></label>
+          <input type="text" class="field-input" placeholder="e.g. Juan dela Cruz"
+                 [value]="manualEntry.full_name"
+                 (input)="onManualField($event, 'full_name')">
         </div>
+
+        <div class="field-group">
+          <label class="field-label">Birthday <span class="required-mark">*</span></label>
+          <input type="date" class="field-input"
+                 [value]="manualEntry.birthday"
+                 (input)="onManualField($event, 'birthday')">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Address</label>
+          <input type="text" class="field-input" placeholder="e.g. Brgy. Ususan, Taguig City"
+                 [value]="manualEntry.address"
+                 (input)="onManualField($event, 'address')">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">ID Number <span class="required-mark">*</span></label>
+          <input type="text" class="field-input" placeholder="ID number from your card"
+                 [value]="manualEntry.id_number"
+                 (input)="onManualField($event, 'id_number')">
+        </div>
+
+        <p *ngIf="manualError" class="error-msg">⚠️ {{ manualError }}</p>
+
+        <button (click)="submitManualEntry()" class="btn-submit" [disabled]="loading">
+          <span *ngIf="!loading">➡️ Continue with these details</span>
+          <span *ngIf="loading">⏳ Processing...</span>
+        </button>
       </div>
 
       <button (click)="resetKiosk()" class="btn-link">← Back to ID Selection</button>
@@ -203,41 +270,93 @@
     <!-- ── STEP: PREVIEW ── -->
     <div *ngIf="currentStep === 'preview'" class="fade-in">
       <h2 class="step-title">Please Verify Your Information</h2>
-      <p class="step-hint">Make sure all details below are correct before proceeding.</p>
+      <p class="step-hint">
+        Check all details carefully.
+        <strong>Tap any field to edit</strong> if something is incorrect.
+      </p>
 
       <div class="info-card">
         <div *ngIf="capturedImageUrl" class="id-thumb-wrap">
           <img [src]="capturedImageUrl" class="id-thumb" alt="Your ID">
         </div>
-        <div class="info-row">
+
+        <!-- Editable rows -->
+        <div class="info-row" [class.editing]="editingField === 'full_name'">
           <span class="info-label">Full Name</span>
-          <span class="info-value">{{ visitorData?.full_name }}</span>
+          <div class="info-value-wrap">
+            <span *ngIf="editingField !== 'full_name'" class="info-value" (click)="startEdit('full_name')">
+              {{ visitorData?.full_name }}
+              <span class="edit-icon">✏️</span>
+            </span>
+            <div *ngIf="editingField === 'full_name'" class="edit-input-wrap">
+              <input class="edit-input" type="text" [value]="visitorData?.full_name"
+                     (input)="onEditField($event, 'full_name')" autofocus>
+              <button class="btn-save-edit" (click)="saveEdit()">✓</button>
+            </div>
+          </div>
         </div>
-        <div class="info-row">
+
+        <div class="info-row" [class.editing]="editingField === 'birthday'">
           <span class="info-label">Birthday</span>
-          <span class="info-value">{{ visitorData?.birthday }}</span>
+          <div class="info-value-wrap">
+            <span *ngIf="editingField !== 'birthday'" class="info-value" (click)="startEdit('birthday')">
+              {{ visitorData?.birthday }}
+              <span class="edit-icon">✏️</span>
+            </span>
+            <div *ngIf="editingField === 'birthday'" class="edit-input-wrap">
+              <input class="edit-input" type="text" [value]="visitorData?.birthday"
+                     (input)="onEditField($event, 'birthday')">
+              <button class="btn-save-edit" (click)="saveEdit()">✓</button>
+            </div>
+          </div>
         </div>
-        <div class="info-row">
+
+        <div class="info-row" [class.editing]="editingField === 'address'">
           <span class="info-label">Address</span>
-          <span class="info-value">{{ visitorData?.address }}</span>
+          <div class="info-value-wrap">
+            <span *ngIf="editingField !== 'address'" class="info-value" (click)="startEdit('address')">
+              {{ visitorData?.address }}
+              <span class="edit-icon">✏️</span>
+            </span>
+            <div *ngIf="editingField === 'address'" class="edit-input-wrap">
+              <input class="edit-input" type="text" [value]="visitorData?.address"
+                     (input)="onEditField($event, 'address')">
+              <button class="btn-save-edit" (click)="saveEdit()">✓</button>
+            </div>
+          </div>
         </div>
-        <div class="info-row">
+
+        <div class="info-row" [class.editing]="editingField === 'id_number'">
           <span class="info-label">ID Number</span>
-          <span class="info-value">{{ visitorData?.id_number }}</span>
+          <div class="info-value-wrap">
+            <span *ngIf="editingField !== 'id_number'" class="info-value" (click)="startEdit('id_number')">
+              {{ visitorData?.id_number }}
+              <span class="edit-icon">✏️</span>
+            </span>
+            <div *ngIf="editingField === 'id_number'" class="edit-input-wrap">
+              <input class="edit-input" type="text" [value]="visitorData?.id_number"
+                     (input)="onEditField($event, 'id_number')">
+              <button class="btn-save-edit" (click)="saveEdit()">✓</button>
+            </div>
+          </div>
         </div>
+
         <div class="info-row">
           <span class="info-label">ID Type</span>
-          <span class="info-value">{{ selectedIdType }}</span>
+          <span class="info-value no-edit">{{ selectedIdType }}</span>
         </div>
+
         <div class="info-row highlight-row">
           <span class="info-label">Control #</span>
-          <span class="info-value">{{ visitorData?.control_no }}</span>
+          <span class="info-value no-edit">{{ visitorData?.control_no }}</span>
         </div>
       </div>
 
+      <p class="edit-notice">✏️ Tap any field above to correct it before continuing.</p>
+
       <div class="btn-row">
         <button (click)="retakePhoto()" class="btn-retake">↩ Rescan ID</button>
-        <button (click)="confirmData()" class="btn-submit">Confirm & Continue</button>
+        <button (click)="confirmData()" class="btn-submit">✅ Confirm & Continue</button>
       </div>
     </div>
 
@@ -266,11 +385,12 @@
         </div>
         <div class="qr-wrap">
           <p class="qr-label">Scan at Exit Gate</p>
-          <img *ngIf="qrCodeImage" [src]="qrCodeImage" alt="Exit QR Code" class="qr-img">
+          <img [src]="qrCodeImage" alt="Exit QR Code" class="qr-img"
+               onerror="this.src='https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl='+encodeURIComponent(this.alt)">
         </div>
         <div class="pass-actions no-print">
-          <button (click)="printPass()" class="btn-print">PRINT RECEIPT</button>
-          <button (click)="resetKiosk()" class="btn-done">DONE</button>
+          <button (click)="printPass()" class="btn-print">🖨️ PRINT RECEIPT</button>
+          <button (click)="resetKiosk()" class="btn-done">✅ DONE</button>
         </div>
       </div>
     </div>
