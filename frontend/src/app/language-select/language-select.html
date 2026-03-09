@@ -1,0 +1,60 @@
+<div class="splash-wrapper">
+
+  <!-- Background cityscape overlay -->
+  <div class="splash-bg"></div>
+
+  <!-- Logo + title -->
+  <div class="splash-header">
+    <img src="taguig-logo.png" alt="Taguig Logo" class="splash-logo"
+         onerror="this.style.display='none'">
+    <div class="splash-title-block">
+      <span class="splash-city">City Government of Taguig</span>
+      <span class="splash-sub">Visitor Management System</span>
+    </div>
+  </div>
+
+  <!-- Center card -->
+  <div class="splash-card">
+
+    <p class="splash-prompt-en">Please choose your preferred language.</p>
+    <p class="splash-prompt-fil">Mangyaring piliin ang inyong nais na wika.</p>
+
+    <div class="lang-options">
+
+      <!-- English -->
+      <button
+        class="lang-btn lang-en"
+        [class.selected]="animating === 'en'"
+        (click)="choose('en')">
+        <span class="lang-flag">🇺🇸</span>
+        <span class="lang-name">English</span>
+        <span class="lang-native">English</span>
+      </button>
+
+      <!-- Divider -->
+      <div class="lang-divider">
+        <span class="divider-line"></span>
+        <span class="divider-text">or / o</span>
+        <span class="divider-line"></span>
+      </div>
+
+      <!-- Filipino -->
+      <button
+        class="lang-btn lang-fil"
+        [class.selected]="animating === 'fil'"
+        (click)="choose('fil')">
+        <span class="lang-flag">🇵🇭</span>
+        <span class="lang-name">Filipino</span>
+        <span class="lang-native">Wikang Filipino</span>
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="splash-footer">
+    <p>© {{ today }} City Government of Taguig &nbsp;·&nbsp; Visitor Kiosk System</p>
+  </footer>
+
+</div>

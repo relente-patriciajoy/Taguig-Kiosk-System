@@ -1,0 +1,301 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;800&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Full-screen splash ── */
+.splash-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'Barlow', sans-serif;
+  background:
+    conic-gradient(from 270deg at 50% -10%,
+      rgba(192, 57, 43, 0.12) 0deg, rgba(255, 255, 255, 0) 25deg,
+      rgba(26, 58, 107, 0.10) 50deg, rgba(255, 255, 255, 0) 75deg,
+      rgba(192, 57, 43, 0.10) 100deg, rgba(255, 255, 255, 0) 125deg,
+      rgba(26, 58, 107, 0.12) 150deg, rgba(255, 255, 255, 0) 175deg,
+      rgba(192, 57, 43, 0.10) 200deg, rgba(255, 255, 255, 0) 225deg,
+      rgba(26, 58, 107, 0.10) 250deg, rgba(255, 255, 255, 0) 275deg,
+      rgba(192, 57, 43, 0.12) 300deg, rgba(255, 255, 255, 0) 325deg,
+      rgba(26, 58, 107, 0.10) 350deg, rgba(255, 255, 255, 0) 360deg), #f4f7ff;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Top header ── */
+.splash-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 28px 40px;
+  align-self: flex-start;
+  animation: fade-down 0.6s ease-out;
+}
+
+.splash-logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.splash-title-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.splash-city {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.splash-sub {
+  font-size: 12px;
+  color: #999;
+}
+
+/* ── Center card ── */
+.splash-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 28px;
+  padding: 56px 64px;
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.10);
+  border: 1.5px solid rgba(26, 58, 107, 0.08);
+  animation: pop-in 0.5s cubic-bezier(.34, 1.56, .64, 1);
+  max-width: 560px;
+  width: 90%;
+}
+
+.splash-prompt-en,
+.splash-prompt-fil {
+  text-align: center;
+  font-size: 15px;
+  color: #777;
+  line-height: 1.5;
+}
+
+.splash-prompt-fil {
+  font-size: 13px;
+  color: #aaa;
+  margin-top: -22px;
+}
+
+/* ── Language options row ── */
+.lang-options {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+
+/* ── Each language button ── */
+.lang-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px 20px;
+  border-radius: 20px;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(.34, 1.56, .64, 1), box-shadow 0.25s, border-color 0.2s, background 0.2s;
+  background: #f8f9ff;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Shine sweep */
+.lang-btn::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -75%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.45s;
+}
+
+.lang-btn:hover::before {
+  left: 125%;
+}
+
+.lang-en:hover {
+  border-color: #1a3a6b;
+  background: #eef3ff;
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 16px 40px rgba(26, 58, 107, 0.18);
+}
+
+.lang-fil:hover {
+  border-color: #c0392b;
+  background: #fff0ef;
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 16px 40px rgba(192, 57, 43, 0.18);
+}
+
+/* Selected flash state */
+.lang-en.selected {
+  background: #1a3a6b;
+  border-color: #1a3a6b;
+}
+
+.lang-fil.selected {
+  background: #c0392b;
+  border-color: #c0392b;
+}
+
+.lang-btn.selected .lang-name,
+.lang-btn.selected .lang-native {
+  color: white;
+}
+
+.lang-flag {
+  font-size: 52px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+.lang-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #1a1a2e;
+  text-transform: uppercase;
+}
+
+.lang-native {
+  font-size: 13px;
+  color: #888;
+  font-style: italic;
+}
+
+/* ── Or divider ── */
+.lang-divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.divider-line {
+  width: 1px;
+  height: 40px;
+  background: #ddd;
+}
+
+.divider-text {
+  font-size: 12px;
+  color: #bbb;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ── Footer ── */
+.splash-footer {
+  padding: 20px;
+  font-size: 12px;
+  color: #bbb;
+  text-align: center;
+  animation: fade-up 0.8s ease-out;
+}
+
+/* ── Animations ── */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Mobile ── */
+@media (max-width: 500px) {
+  .splash-card {
+    padding: 36px 24px;
+  }
+
+  .lang-options {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .lang-divider {
+    flex-direction: row;
+  }
+
+  .divider-line {
+    width: 40px;
+    height: 1px;
+  }
+
+  .lang-flag {
+    font-size: 40px;
+  }
+
+  .lang-name {
+    font-size: 26px;
+  }
+}
+
+/* ── Kiosk ── */
+@media (min-height: 900px) {
+  .splash-card {
+    padding: 72px 80px;
+    gap: 40px;
+  }
+
+  .lang-flag {
+    font-size: 64px;
+  }
+
+  .lang-name {
+    font-size: 38px;
+  }
+
+  .lang-btn {
+    padding: 40px 28px;
+  }
+}
