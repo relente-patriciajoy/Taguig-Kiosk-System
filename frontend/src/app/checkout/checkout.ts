@@ -156,6 +156,9 @@ export class CheckoutComponent implements OnDestroy {
           this.currentStep = 'result';
           this.loading = false;
           this.detachScannerListener();
+          // Decrement "currently inside" counter
+          const inside = parseInt(sessionStorage.getItem('tgk_in') ?? '0', 10);
+          sessionStorage.setItem('tgk_in', String(Math.max(0, inside - 1)));
         }
         this.cdr.markForCheck();
       },
