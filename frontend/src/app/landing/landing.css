@@ -110,30 +110,6 @@
   color: white;
 }
 
-/* ── Filipino Banner ── */
-.filipino-banner {
-  background: linear-gradient(90deg, #1a3a6b, #2756a8, #c0392b);
-  color: white;
-  text-align: center;
-  padding: 10px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  animation: shimmer 4s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.85;
-  }
-}
-
 /* ── Main Content ── */
 .main-content {
   flex: 1;
@@ -307,6 +283,12 @@
   transition: transform 0.3s cubic-bezier(.34, 1.56, .64, 1), box-shadow 0.3s, border-color 0.3s;
   position: relative;
   overflow: hidden;
+  /* Equal height — push steps and button to bottom */
+  justify-content: flex-start;
+}
+
+.card-desc {
+  flex: 1;
 }
 
 /* Shine sweep on hover */
@@ -375,6 +357,7 @@
   font-size: 14px;
   color: #666;
   line-height: 1.6;
+  flex: 1;
 }
 
 .card-steps {
