@@ -10,7 +10,7 @@
         <span class="nav-sub">Visitor Management System</span>
       </div>
     </div>
-    <button (click)="goHome()" class="btn-home-nav">🏠 Home</button>
+    <button (click)="goHome()" class="btn-home-nav">Home</button>
   </nav>
 
   <div class="checkout-body">
@@ -86,7 +86,7 @@
           (click)="submitManual()"
           class="btn-submit"
           [disabled]="loading || !manualInput">
-          <span *ngIf="!loading">✅ Confirm Check-Out</span>
+          <span *ngIf="!loading">Confirm Check-Out</span>
           <span *ngIf="loading">⏳ Processing...</span>
         </button>
 
