@@ -14,27 +14,27 @@
   <div class="step-bar">
     <div class="step-item" [class.active]="currentStep === 'home'" [class.done]="['scan','preview','purpose','ticket'].includes(currentStep)">
       <div class="step-dot">1</div>
-      <span>Select ID</span>
+      <span>{{ labels.stepSelectId }}</span>
     </div>
     <div class="step-line" [class.done]="['scan','preview','purpose','ticket'].includes(currentStep)"></div>
     <div class="step-item" [class.active]="currentStep === 'scan'" [class.done]="['preview','purpose','ticket'].includes(currentStep)">
       <div class="step-dot">2</div>
-      <span>Scan ID</span>
+      <span>{{ labels.stepScanId }}</span>
     </div>
     <div class="step-line" [class.done]="['preview','purpose','ticket'].includes(currentStep)"></div>
     <div class="step-item" [class.active]="currentStep === 'preview'" [class.done]="['purpose','ticket'].includes(currentStep)">
       <div class="step-dot">3</div>
-      <span>Verify</span>
+      <span>{{ labels.stepVerify }}</span>
     </div>
     <div class="step-line" [class.done]="['purpose','ticket'].includes(currentStep)"></div>
     <div class="step-item" [class.active]="currentStep === 'purpose'" [class.done]="currentStep === 'ticket'">
       <div class="step-dot">4</div>
-      <span>Purpose</span>
+      <span>{{ labels.stepPurpose }}</span>
     </div>
     <div class="step-line" [class.done]="currentStep === 'ticket'"></div>
     <div class="step-item" [class.active]="currentStep === 'ticket'">
       <div class="step-dot">5</div>
-      <span>Get Pass</span>
+      <span>{{ labels.stepGetPass }}</span>
     </div>
   </div>
 
@@ -44,37 +44,37 @@
     <div *ngIf="currentStep === 'home'" class="fade-in">
 
       <div class="instructions-banner">
-        <h2 class="instructions-title">📋 How It Works</h2>
+        <h2 class="instructions-title">{{ labels.howItWorks }}</h2>
         <div class="instructions-steps">
           <div class="instr-item">
             <div class="instr-num">1</div>
             <div class="instr-text">
-              <strong>Select your ID type</strong>
-              <span>Choose the government ID you brought today</span>
+              <strong>{{ labels.instr1Title }}</strong>
+              <span>{{ labels.instr1Desc }}</span>
             </div>
           </div>
           <div class="instr-arrow">→</div>
           <div class="instr-item">
             <div class="instr-num">2</div>
             <div class="instr-text">
-              <strong>Scan your ID</strong>
-              <span>Hold your ID steady in front of the camera</span>
+              <strong>{{ labels.instr2Title }}</strong>
+              <span>{{ labels.instr2Desc }}</span>
             </div>
           </div>
           <div class="instr-arrow">→</div>
           <div class="instr-item">
             <div class="instr-num">3</div>
             <div class="instr-text">
-              <strong>Verify details</strong>
-              <span>Confirm your information is correct</span>
+              <strong>{{ labels.instr3Title }}</strong>
+              <span>{{ labels.instr3Desc }}</span>
             </div>
           </div>
           <div class="instr-arrow">→</div>
           <div class="instr-item">
             <div class="instr-num">4</div>
             <div class="instr-text">
-              <strong>Get your pass</strong>
-              <span>Print your visitor pass and proceed</span>
+              <strong>{{ labels.instr4Title }}</strong>
+              <span>{{ labels.instr4Desc }}</span>
             </div>
           </div>
         </div>
@@ -82,7 +82,7 @@
 
       <div class="section-label">
         <span class="id-icon">🪪</span>
-        <h2>Select your ID type to begin</h2>
+        <h2>{{ labels.selectIdTitle }}</h2>
       </div>
       <div class="id-grid">
         <button *ngFor="let id of idTypes" (click)="selectIdType(id)" class="btn-id">
@@ -97,10 +97,10 @@
       <!-- Scan mode toggle -->
       <div class="scan-mode-toggle">
         <button class="mode-btn" [class.mode-active]="scanInputMode === 'camera'" (click)="setScanMode('camera')">
-          📷 Camera Scan
+          {{ labels.cameraScan }}
         </button>
         <button class="mode-btn" [class.mode-active]="scanInputMode === 'manual'" (click)="setScanMode('manual')">
-          ⌨️ Type Manually
+          {{ labels.typeManually }}
         </button>
       </div>
 
@@ -111,9 +111,9 @@
           <span class="status-icon">{{ statusIcon }}</span>
           <span class="status-msg">
             <ng-container *ngIf="countdownValue > 0; else normalMsg">
-              Capturing in <strong>{{ countdownValue }}</strong>...
+              {{ labels.capturingIn }} <strong>{{ countdownValue }}</strong>...
             </ng-container>
-            <ng-template #normalMsg>{{ frameMessage || 'Analyzing...' }}</ng-template>
+            <ng-template #normalMsg>{{ frameMessage || labels.analyzing }}</ng-template>
           </span>
         </div>
 
@@ -145,42 +145,35 @@
 
           <div *ngIf="cameraState === 'initializing'" class="cam-overlay">
             <span class="overlay-icon">⏳</span>
-            <p>Starting camera...</p>
+            <p>{{ labels.startingCamera }}</p>
           </div>
 
           <div *ngIf="cameraState === 'error-hardware'" class="cam-overlay">
             <span class="overlay-icon">📷</span>
-            <p>Camera is currently unavailable.</p>
-            <p class="overlay-hint">Another app may be using the camera.</p>
-            <button (click)="retryCamera()" class="btn-retry">🔄 Retry Camera</button>
+            <p>{{ labels.cameraUnavail }}</p>
+            <p class="overlay-hint">{{ labels.cameraAnotherApp }}</p>
+            <button (click)="retryCamera()" class="btn-retry">{{ labels.retryCamera }}</button>
           </div>
 
           <div *ngIf="cameraState === 'error-permission'" class="cam-overlay">
             <span class="overlay-icon">🚫</span>
-            <p>Camera permission was denied.</p>
-            <p class="overlay-hint">
-              Click the 🔒 icon in the address bar,<br>
-              set Camera to <strong>Allow</strong>, then reload.
-            </p>
+            <p>{{ labels.cameraDenied }}</p>
+            <p class="overlay-hint">{{ labels.cameraDeniedHint }}</p>
           </div>
 
-          <!-- ID guide box with corners -->
+          <!-- ID guide box -->
           <div *ngIf="cameraState === 'ready'" class="id-guide-overlay">
             <div class="id-guide-box" [ngClass]="statusColor">
               <div class="corner top-left"></div>
               <div class="corner top-right"></div>
               <div class="corner bottom-left"></div>
               <div class="corner bottom-right"></div>
-
-              <!-- Animated scan line — shows when ID is detected -->
               <div class="scan-line-wrap" *ngIf="frameStatus === 'good' || countdownValue > 0">
                 <div class="scan-line"></div>
               </div>
-
-              <!-- Idle pulse when no ID -->
               <div class="idle-pulse" *ngIf="frameStatus === 'no_id'"></div>
             </div>
-            <p class="guide-label">Align your ID within the box</p>
+            <p class="guide-label">{{ labels.alignId }}</p>
           </div>
 
           <!-- Countdown overlay -->
@@ -190,31 +183,29 @@
 
           <!-- Captured badge -->
           <div *ngIf="cameraState === 'captured'" class="captured-badge">
-            Photo Taken
+            {{ labels.photoTaken }}
           </div>
         </div>
 
-        <h2 class="scan-title">Scanning: {{ selectedIdType }}</h2>
-
-        <p *ngIf="cameraState === 'ready'" class="scan-hint">
-          Hold your ID flat and steady inside the guide box.<br>
-          The camera will capture automatically when ready.
-        </p>
+        <div *ngIf="cameraState === 'ready' || cameraState === 'initializing'" class="scan-info">
+          <p><strong>{{ labels.scanningLabel }}</strong> {{ selectedIdType }}</p>
+          <p class="scan-sub-hint">{{ labels.scanSubHint }}</p>
+        </div>
 
         <button
           *ngIf="cameraState === 'ready'"
           (click)="captureID()"
-          class="btn-capture">
-            Capture Manually
+          class="btn-capture-manual">
+          {{ labels.captureManually }}
         </button>
 
         <div *ngIf="cameraState === 'captured'" class="action-row">
-          <p class="scan-hint">Is your ID clearly visible in the photo?</p>
+          <p class="scan-hint">{{ labels.idVisibleQ }}</p>
           <div class="btn-row">
-            <button (click)="retakePhoto()" class="btn-retake">↩ Retake</button>
+            <button (click)="retakePhoto()" class="btn-retake">{{ labels.retake }}</button>
             <button (click)="submitCapture()" class="btn-submit" [disabled]="loading">
-              <span *ngIf="!loading">✅ Looks Good — Submit</span>
-              <span *ngIf="loading">⏳ Reading ID...</span>
+              <span *ngIf="!loading">{{ labels.looksGood }}</span>
+              <span *ngIf="loading">{{ labels.readingId }}</span>
             </button>
           </div>
         </div>
@@ -224,34 +215,34 @@
       <!-- ── Manual Type Mode ── -->
       <div *ngIf="scanInputMode === 'manual'" class="manual-entry-card fade-in">
         <p class="manual-desc">
-          Enter the details from your ID manually.<br>
-          All fields marked <span class="required-mark">*</span> are required.
+          {{ labels.manualDesc }}<br>
+          {{ labels.manualRequired }}
         </p>
 
         <div class="field-group">
-          <label class="field-label">Full Name <span class="required-mark">*</span></label>
-          <input type="text" class="field-input" placeholder="e.g. Juan dela Cruz"
+          <label class="field-label">{{ labels.fullName }} <span class="required-mark">*</span></label>
+          <input type="text" class="field-input" [placeholder]="labels.fullNamePH"
                  [value]="manualEntry.full_name"
                  (input)="onManualField($event, 'full_name')">
         </div>
 
         <div class="field-group">
-          <label class="field-label">Birthday <span class="required-mark">*</span></label>
+          <label class="field-label">{{ labels.birthday }} <span class="required-mark">*</span></label>
           <input type="date" class="field-input"
                  [value]="manualEntry.birthday"
                  (input)="onManualField($event, 'birthday')">
         </div>
 
         <div class="field-group">
-          <label class="field-label">Address</label>
-          <input type="text" class="field-input" placeholder="e.g. Brgy. Ususan, Taguig City"
+          <label class="field-label">{{ labels.address }}</label>
+          <input type="text" class="field-input" [placeholder]="labels.addressPH"
                  [value]="manualEntry.address"
                  (input)="onManualField($event, 'address')">
         </div>
 
         <div class="field-group">
-          <label class="field-label">ID Number <span class="required-mark">*</span></label>
-          <input type="text" class="field-input" placeholder="ID number from your card"
+          <label class="field-label">{{ labels.idNumber }} <span class="required-mark">*</span></label>
+          <input type="text" class="field-input" [placeholder]="labels.idNumberPH"
                  [value]="manualEntry.id_number"
                  (input)="onManualField($event, 'id_number')">
         </div>
@@ -259,20 +250,20 @@
         <p *ngIf="manualError" class="error-msg">⚠️ {{ manualError }}</p>
 
         <button (click)="submitManualEntry()" class="btn-submit" [disabled]="loading">
-          <span *ngIf="!loading">Continue with these details</span>
-          <span *ngIf="loading">Processing...</span>
+          <span *ngIf="!loading">{{ labels.continueDetails }}</span>
+          <span *ngIf="loading">{{ labels.processing }}</span>
         </button>
       </div>
 
-      <button (click)="resetKiosk()" class="btn-link">← Back to ID Selection</button>
+      <button (click)="resetKiosk()" class="btn-link">{{ labels.backToIdSelection }}</button>
     </div>
 
     <!-- ── STEP: PREVIEW ── -->
     <div *ngIf="currentStep === 'preview'" class="fade-in">
-      <h2 class="step-title">Please Verify Your Information</h2>
+      <h2 class="step-title">{{ labels.verifyTitle }}</h2>
       <p class="step-hint">
-        Check all details carefully.
-        <strong>Tap any field to edit</strong> if something is incorrect.
+        {{ labels.verifyHint }}
+        <strong>{{ labels.tapToEdit }}</strong> if something is incorrect.
       </p>
 
       <div class="info-card">
@@ -280,13 +271,11 @@
           <img [src]="capturedImageUrl" class="id-thumb" alt="Your ID">
         </div>
 
-        <!-- Editable rows -->
         <div class="info-row" [class.editing]="editingField === 'full_name'">
-          <span class="info-label">Full Name</span>
+          <span class="info-label">{{ labels.labelFullName }}</span>
           <div class="info-value-wrap">
             <span *ngIf="editingField !== 'full_name'" class="info-value" (click)="startEdit('full_name')">
-              {{ visitorData?.full_name }}
-              <span class="edit-icon">✏️</span>
+              {{ visitorData?.full_name }}<span class="edit-icon">✏️</span>
             </span>
             <div *ngIf="editingField === 'full_name'" class="edit-input-wrap">
               <input class="edit-input" type="text" [value]="visitorData?.full_name"
@@ -297,11 +286,10 @@
         </div>
 
         <div class="info-row" [class.editing]="editingField === 'birthday'">
-          <span class="info-label">Birthday</span>
+          <span class="info-label">{{ labels.labelBirthday }}</span>
           <div class="info-value-wrap">
             <span *ngIf="editingField !== 'birthday'" class="info-value" (click)="startEdit('birthday')">
-              {{ visitorData?.birthday }}
-              <span class="edit-icon">✏️</span>
+              {{ visitorData?.birthday }}<span class="edit-icon">✏️</span>
             </span>
             <div *ngIf="editingField === 'birthday'" class="edit-input-wrap">
               <input class="edit-input" type="text" [value]="visitorData?.birthday"
@@ -312,11 +300,10 @@
         </div>
 
         <div class="info-row" [class.editing]="editingField === 'address'">
-          <span class="info-label">Address</span>
+          <span class="info-label">{{ labels.labelAddress }}</span>
           <div class="info-value-wrap">
             <span *ngIf="editingField !== 'address'" class="info-value" (click)="startEdit('address')">
-              {{ visitorData?.address }}
-              <span class="edit-icon">✏️</span>
+              {{ visitorData?.address }}<span class="edit-icon">✏️</span>
             </span>
             <div *ngIf="editingField === 'address'" class="edit-input-wrap">
               <input class="edit-input" type="text" [value]="visitorData?.address"
@@ -327,11 +314,10 @@
         </div>
 
         <div class="info-row" [class.editing]="editingField === 'id_number'">
-          <span class="info-label">ID Number</span>
+          <span class="info-label">{{ labels.labelIdNumber }}</span>
           <div class="info-value-wrap">
             <span *ngIf="editingField !== 'id_number'" class="info-value" (click)="startEdit('id_number')">
-              {{ visitorData?.id_number }}
-              <span class="edit-icon">✏️</span>
+              {{ visitorData?.id_number }}<span class="edit-icon">✏️</span>
             </span>
             <div *ngIf="editingField === 'id_number'" class="edit-input-wrap">
               <input class="edit-input" type="text" [value]="visitorData?.id_number"
@@ -342,65 +328,60 @@
         </div>
 
         <div class="info-row">
-          <span class="info-label">ID Type</span>
+          <span class="info-label">{{ labels.labelIdType }}</span>
           <span class="info-value no-edit">{{ selectedIdType }}</span>
         </div>
 
         <div class="info-row highlight-row">
-          <span class="info-label">Control #</span>
+          <span class="info-label">{{ labels.labelControl }}</span>
           <span class="info-value no-edit">{{ visitorData?.control_no }}</span>
         </div>
       </div>
 
-      <p class="edit-notice">✏️ Tap any field above to correct it before continuing.</p>
+      <p class="edit-notice">{{ labels.editNotice }}</p>
 
       <div class="btn-row">
-        <button (click)="retakePhoto()" class="btn-retake">↩ Rescan ID</button>
-        <button (click)="confirmData()" class="btn-submit">Confirm & Continue</button>
+        <button (click)="retakePhoto()" class="btn-retake">{{ labels.rescanId }}</button>
+        <button (click)="confirmData()" class="btn-submit">{{ labels.confirmContinue }}</button>
       </div>
     </div>
 
     <!-- ── STEP: PURPOSE ── -->
     <div *ngIf="currentStep === 'purpose'" class="fade-in">
-      <h2 class="step-title">Hello, {{ visitorData?.full_name }}!</h2>
-      <p class="step-hint">What is the purpose of your visit today?</p>
+      <h2 class="step-title">{{ labels.purposeHello }}, {{ visitorData?.full_name }}! 👋</h2>
+      <p class="step-hint">{{ labels.purposeQuestion }}</p>
       <div class="id-grid">
         <button *ngFor="let p of purposes" (click)="selectPurpose(p)" class="btn-id">{{ p }}</button>
       </div>
-      <button (click)="resetKiosk()" class="btn-link">Cancel and Start Over</button>
+      <button (click)="resetKiosk()" class="btn-link">{{ labels.cancelStartOver }}</button>
     </div>
 
     <!-- ── STEP: TICKET ── -->
     <div *ngIf="currentStep === 'ticket'" class="fade-in">
       <div class="visitor-pass" id="printable-pass">
-        <h3 class="pass-title">VISITOR PASS</h3>
+        <h3 class="pass-title">{{ labels.visitorPass }}</h3>
         <div class="pass-details">
-          <p><strong>NAME:</strong> {{ visitorData?.full_name }}</p>
-          <p><strong>BIRTHDAY:</strong> {{ visitorData?.birthday }}</p>
-          <p><strong>ID TYPE:</strong> {{ selectedIdType }}</p>
-          <p><strong>ID NUMBER:</strong> {{ visitorData?.id_number }}</p>
-          <p><strong>PURPOSE:</strong> {{ selectedPurpose }}</p>
-          <p><strong>TIME IN:</strong> {{ visitorData?.time_in }}</p>
-          <p><strong>CONTROL #:</strong> {{ visitorData?.control_no }}</p>
+          <p><strong>{{ labels.labelName }}:</strong> {{ visitorData?.full_name }}</p>
+          <p><strong>{{ labels.labelBirthday }}:</strong> {{ visitorData?.birthday }}</p>
+          <p><strong>{{ labels.labelIdType }}:</strong> {{ selectedIdType }}</p>
+          <p><strong>{{ labels.labelIdNumber }}:</strong> {{ visitorData?.id_number }}</p>
+          <p><strong>{{ labels.labelPurpose }}:</strong> {{ selectedPurpose }}</p>
+          <p><strong>{{ labels.labelTimeIn }}:</strong> {{ visitorData?.time_in }}</p>
+          <p><strong>{{ labels.labelControl }}:</strong> {{ visitorData?.control_no }}</p>
         </div>
         <div class="qr-wrap">
-          <p class="qr-label">Scan at Exit Gate</p>
-          <div class="qr-loading-wrap">
-            <img [src]="qrCodeImage" alt="QR Code" class="qr-img"
-                 (load)="onQrLoaded()" (error)="onQrError()"
-                 [class.qr-hidden]="!qrLoaded && !qrError">
-            <div class="qr-placeholder" *ngIf="!qrLoaded && !qrError">
-              <div class="qr-spinner"></div>
-              <p>Loading QR...</p>
-            </div>
-            <div class="qr-missing" *ngIf="qrError">
-              <p>QR unavailable — use Control # at exit</p>
-            </div>
+          <p class="qr-label">{{ labels.scanAtExit }}</p>
+          <img *ngIf="qrCodeImage && qrLoaded" [src]="qrCodeImage" class="qr-img" alt="QR Code">
+          <div *ngIf="!qrLoaded && !qrError" class="qr-loading">
+            <div class="spinner"></div>
           </div>
+          <img *ngIf="qrCodeImage" [src]="qrCodeImage" style="display:none"
+               (load)="onQrLoaded()" (error)="onQrError()">
+          <p class="qr-control">{{ labels.labelControl }}: <strong>{{ visitorData?.control_no }}</strong></p>
         </div>
         <div class="pass-actions no-print">
-          <button (click)="printPass()" class="btn-print">PRINT RECEIPT</button>
-          <button (click)="resetKiosk()" class="btn-done">DONE</button>
+          <button (click)="printPass()" class="btn-print">{{ labels.printReceipt }}</button>
+          <button (click)="resetKiosk()" class="btn-done">{{ labels.done }}</button>
         </div>
       </div>
     </div>

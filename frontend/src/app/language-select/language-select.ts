@@ -7,8 +7,7 @@ import { LangService, Lang } from '../services/lang.service';
   standalone: true,
   templateUrl: './language-select.html',
   styleUrl: './language-select.css',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [LangService]
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LanguageSelectComponent {
 
@@ -16,7 +15,7 @@ export class LanguageSelectComponent {
   today = new Date().getFullYear();
 
   constructor(
-    private router: Router,
+    private router:      Router,
     private langService: LangService
   ) { }
 

@@ -14,7 +14,6 @@ import { LangService, AppLabels } from '../services/lang.service';
   selector: 'app-landing',
   standalone: true,
   imports: [CommonModule],
-  providers: [LangService],
   templateUrl: './landing.html',
   styleUrl: './landing.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -22,18 +21,18 @@ import { LangService, AppLabels } from '../services/lang.service';
 export class LandingComponent implements OnInit, OnDestroy {
 
   // Properties
-  currentTime = new Date();
+  currentTime   = new Date();
   visitorsToday = 0;
-  visitorsIn = 0;
+  visitorsIn    = 0;
   labels!: AppLabels;
 
-  private clockInterval: any = null;
-  private counterInterval: any = null;
-  private langSub!: Subscription;
+  private clockInterval:   any          = null;
+  private counterInterval: any          = null;
+  private langSub!:        Subscription;
 
   constructor(
-    private router: Router,
-    private cdr: ChangeDetectorRef,
+    private router:      Router,
+    private cdr:         ChangeDetectorRef,
     private langService: LangService
   ) { }
 
@@ -56,29 +55,28 @@ export class LandingComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.clockInterval) clearInterval(this.clockInterval);
+    if (this.clockInterval)   clearInterval(this.clockInterval);
     if (this.counterInterval) clearInterval(this.counterInterval);
-    if (this.langSub) this.langSub.unsubscribe();
+    if (this.langSub)         this.langSub.unsubscribe();
   }
 
-  toggleLang(): void { this.langService.toggle(); }
 
   private loadCounters(): void {
     fetch('http://127.0.0.1:8000/stats')
       .then(r => r.json())
       .then((data: any) => {
         this.visitorsToday = data.visitors_today ?? 0;
-        this.visitorsIn = data.visitors_in ?? 0;
+        this.visitorsIn    = data.visitors_in    ?? 0;
         this.cdr.markForCheck();
       })
       .catch(() => {
         this.visitorsToday = parseInt(sessionStorage.getItem('tgk_today') ?? '0', 10);
-        this.visitorsIn = parseInt(sessionStorage.getItem('tgk_in') ?? '0', 10);
+        this.visitorsIn    = parseInt(sessionStorage.getItem('tgk_in')    ?? '0', 10);
         this.cdr.markForCheck();
       });
   }
 
   // Methods
-  goToCheckin(): void { this.router.navigate(['/checkin']); }
+  goToCheckin(): void  { this.router.navigate(['/checkin']); }
   goToCheckout(): void { this.router.navigate(['/checkout']); }
 }

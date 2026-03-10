@@ -10,7 +10,7 @@
         <span class="nav-sub">Visitor Management System</span>
       </div>
     </div>
-    <button (click)="goHome()" class="btn-home-nav">Home</button>
+    <button (click)="goHome()" class="btn-home-nav">{{ labels.coHome }}</button>
   </nav>
 
   <div class="checkout-body">
@@ -20,23 +20,17 @@
 
       <div class="page-header">
         <div class="header-icon">🚪</div>
-        <h1 class="page-title">CHECK-OUT</h1>
-        <p class="page-desc">Scan your visitor pass QR code or enter your control number manually.</p>
+        <h1 class="page-title">{{ labels.coTitle }}</h1>
+        <p class="page-desc">{{ labels.coDesc }}</p>
       </div>
 
       <!-- Mode Toggle -->
       <div class="mode-toggle">
-        <button
-          class="mode-btn"
-          [class.mode-active]="inputMode === 'scanner'"
-          (click)="setMode('scanner')">
-          📷 Scan QR / Barcode
+        <button class="mode-btn" [class.mode-active]="inputMode === 'scanner'" (click)="setMode('scanner')">
+          {{ labels.coScanTab }}
         </button>
-        <button
-          class="mode-btn"
-          [class.mode-active]="inputMode === 'manual'"
-          (click)="setMode('manual')">
-          ⌨️ Type Manually
+        <button class="mode-btn" [class.mode-active]="inputMode === 'manual'" (click)="setMode('manual')">
+          {{ labels.coManualTab }}
         </button>
       </div>
 
@@ -49,13 +43,13 @@
               <span class="scanner-icon">📷</span>
               <div class="scan-line"></div>
             </div>
-            <p class="scanner-label">Point the barcode scanner at the QR code</p>
-            <p class="scanner-hint">The scanner will auto-submit once the code is read</p>
+            <p class="scanner-label">{{ labels.coScannerLabel }}</p>
+            <p class="scanner-hint">{{ labels.coScannerHint }}</p>
           </div>
 
           <div *ngIf="loading" class="scanner-processing-wrap">
             <div class="spinner"></div>
-            <p class="scanner-label">Processing check-out...</p>
+            <p class="scanner-label">{{ labels.coProcessing }}</p>
           </div>
 
         </div>
@@ -63,18 +57,18 @@
         <p *ngIf="error" class="error-msg">⚠️ {{ error }}</p>
 
         <p class="switch-hint">
-          No scanner? &nbsp;
-          <button (click)="setMode('manual')" class="btn-text-link">Type manually instead →</button>
+          {{ labels.coNoScanner }} &nbsp;
+          <button (click)="setMode('manual')" class="btn-text-link">{{ labels.coTypeInstead }}</button>
         </p>
       </div>
 
       <!-- Manual Mode -->
       <div *ngIf="inputMode === 'manual'" class="input-card">
-        <label class="input-label">Control Number</label>
+        <label class="input-label">{{ labels.coControlLabel }}</label>
         <input
           type="text"
           class="control-input"
-          placeholder="e.g. TGK-20260305-AB12C"
+          [placeholder]="labels.coControlPH"
           [value]="manualInput"
           (input)="onInputChange($event)"
           (keyup.enter)="submitManual()"
@@ -82,54 +76,53 @@
 
         <p *ngIf="error" class="error-msg">⚠️ {{ error }}</p>
 
-        <button
-          (click)="submitManual()"
-          class="btn-submit"
-          [disabled]="loading || !manualInput">
-          <span *ngIf="!loading">Confirm Check-Out</span>
-          <span *ngIf="loading">⏳ Processing...</span>
+        <button (click)="submitManual()" class="btn-submit" [disabled]="loading || !manualInput">
+          <span *ngIf="!loading">{{ labels.coConfirm }}</span>
+          <span *ngIf="loading">{{ labels.coProcessing }}</span>
         </button>
 
         <p class="switch-hint">
-          Have a scanner? &nbsp;
-          <button (click)="setMode('scanner')" class="btn-text-link">Switch to scan mode →</button>
+          {{ labels.coHaveScanner }} &nbsp;
+          <button (click)="setMode('scanner')" class="btn-text-link">{{ labels.coSwitchScan }}</button>
         </p>
       </div>
+
+      <button (click)="goHome()" class="btn-link">{{ labels.coBackHome }}</button>
     </div>
 
     <!-- ── STEP: RESULT ── -->
     <div *ngIf="currentStep === 'result'" class="fade-in">
       <div class="result-card">
         <div class="result-icon">✅</div>
-        <h2 class="result-title">Check-Out Successful!</h2>
-        <p class="result-sub">Thank you for visiting Taguig City Hall.</p>
+        <h2 class="result-title">{{ labels.coSuccessTitle }}</h2>
+        <p class="result-sub">{{ labels.coSuccessSub }}</p>
 
         <div class="result-details">
           <div class="result-row">
-            <span class="result-label">Name</span>
+            <span class="result-label">{{ labels.coLabelName }}</span>
             <span class="result-value">{{ visitorData?.full_name }}</span>
           </div>
           <div class="result-row">
-            <span class="result-label">Control #</span>
+            <span class="result-label">{{ labels.coLabelControl }}</span>
             <span class="result-value">{{ visitorData?.control_no }}</span>
           </div>
           <div class="result-row">
-            <span class="result-label">Purpose</span>
+            <span class="result-label">{{ labels.coLabelPurpose }}</span>
             <span class="result-value">{{ visitorData?.purpose }}</span>
           </div>
           <div class="result-row">
-            <span class="result-label">Time In</span>
+            <span class="result-label">{{ labels.coLabelTimeIn }}</span>
             <span class="result-value">{{ visitorData?.time_in }}</span>
           </div>
           <div class="result-row highlight">
-            <span class="result-label">Time Out</span>
+            <span class="result-label">{{ labels.coLabelTimeOut }}</span>
             <span class="result-value">{{ visitorData?.time_out }}</span>
           </div>
         </div>
 
         <div class="result-actions">
-          <button (click)="reset()" class="btn-another">Check Out Another Visitor</button>
-          <button (click)="goHome()" class="btn-go-home">Back to Home</button>
+          <button (click)="reset()" class="btn-another">{{ labels.coCheckoutAnother }}</button>
+          <button (click)="goHome()" class="btn-go-home">{{ labels.coGoHome }}</button>
         </div>
       </div>
     </div>

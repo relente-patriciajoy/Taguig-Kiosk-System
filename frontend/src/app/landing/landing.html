@@ -17,8 +17,8 @@
     </div>
 
     <div class="nav-actions">
-      <button (click)="goToCheckin()"  class="btn-checkin">🏛️ Check-In</button>
-      <button (click)="goToCheckout()" class="btn-checkout">🚪 Check-Out</button>
+<button (click)="goToCheckin()"  class="btn-checkin">{{ labels.navCheckin }}</button>
+      <button (click)="goToCheckout()" class="btn-checkout">{{ labels.navCheckout }}</button>
     </div>
   </nav>
 
@@ -27,14 +27,14 @@
 
     <!-- Hero Text -->
     <div class="hero-text">
-      <p class="hero-tagline">TRANSFORMATIVE · LIVELY · CARING</p>
+      <p class="hero-tagline">{{ labels.tagline }}</p>
       <h1 class="hero-heading">
-        <span class="heading-welcome">WELCOME TO THE</span>
+        <span class="heading-welcome">{{ labels.welcomeTo }}</span>
         <span class="heading-city">CITY OF</span>
         <span class="heading-taguig">TAGUIG</span>
       </h1>
-      <p class="hero-italic">Transformative, Lively, and Caring City</p>
-      <p class="hero-prompt">Pumili ng transaksyon sa ibaba upang makapagsimula.</p>
+      <p class="hero-italic">{{ labels.subtitle }}</p>
+      <p class="hero-prompt">{{ labels.prompt }}</p>
     </div>
 
     <!-- Visitor Counter -->
@@ -43,7 +43,7 @@
         <span class="counter-icon">👥</span>
         <div class="counter-info">
           <span class="counter-num">{{ visitorsToday }}</span>
-          <span class="counter-label">Visitors Today</span>
+          <span class="counter-label">{{ labels.visitorsToday }}</span>
         </div>
       </div>
       <div class="counter-divider"></div>
@@ -51,7 +51,7 @@
         <span class="counter-icon">🏛️</span>
         <div class="counter-info">
           <span class="counter-num">{{ visitorsIn }}</span>
-          <span class="counter-label">Currently Inside</span>
+          <span class="counter-label">{{ labels.currentlyInside }}</span>
         </div>
       </div>
       <div class="counter-divider"></div>
@@ -69,43 +69,37 @@
 
       <div class="card card-checkin" (click)="goToCheckin()">
         <div class="card-icon icon-checkin">🏛️</div>
-        <h2 class="card-title">CHECK-IN</h2>
-        <p class="card-desc">
-          Irehistro ang inyong pagbisita sa pamamagitan ng inyong government ID.
-          Makatanggap ng visitor pass na may QR code para sa exit.
-        </p>
+        <h2 class="card-title">{{ labels.checkinTitle }}</h2>
+        <p class="card-desc">{{ labels.checkinDesc }}</p>
         <div class="card-steps">
-          <span class="step">① Select ID</span>
+          <span class="step">{{ labels.step1ci }}</span>
           <span class="step-arrow">→</span>
-          <span class="step">② Scan ID</span>
+          <span class="step">{{ labels.step2ci }}</span>
           <span class="step-arrow">→</span>
-          <span class="step">③ Get Pass</span>
+          <span class="step">{{ labels.step3ci }}</span>
         </div>
-        <button class="card-btn btn-red">MAGSIMULA NG CHECK-IN →</button>
+        <button class="card-btn btn-red">{{ labels.checkinBtn }}</button>
       </div>
 
       <div class="card card-checkout" (click)="goToCheckout()">
         <div class="card-icon icon-checkout">🚪</div>
-        <h2 class="card-title">CHECK-OUT</h2>
-        <p class="card-desc">
-          Ilagay ang inyong control number mula sa visitor pass
-          upang mairehistro ang inyong pag-alis sa gusali.
-        </p>
+        <h2 class="card-title">{{ labels.checkoutTitle }}</h2>
+        <p class="card-desc">{{ labels.checkoutDesc }}</p>
         <div class="card-steps">
-          <span class="step">① Get Pass</span>
+          <span class="step">{{ labels.step1co }}</span>
           <span class="step-arrow">→</span>
-          <span class="step">② Enter #</span>
+          <span class="step">{{ labels.step2co }}</span>
           <span class="step-arrow">→</span>
-          <span class="step">③ Exit</span>
+          <span class="step">{{ labels.step3co }}</span>
         </div>
-        <button class="card-btn btn-blue">MAGSIMULA NG CHECK-OUT →</button>
+        <button class="card-btn btn-blue">{{ labels.checkoutBtn }}</button>
       </div>
 
     </div>
 
   </main>
 
-  <!-- Animated Skyline — always visible, no scroll needed -->
+  <!-- Animated Skyline -->
   <div class="skyline-wrap">
     <div class="skyline-scroll">
       <svg class="skyline-svg" viewBox="0 0 2400 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
@@ -140,8 +134,8 @@
         <rect x="388" y="40"  width="14" height="22"  fill="#8b1a1a"/>
         <rect x="370" y="100" width="25" height="40"  fill="#1a3a6b"/>
         <rect x="405" y="100" width="25" height="40"  fill="#1a3a6b"/>
-        <rect x="375" y="108" width="8" height="10" fill="white" opacity="0.7"/>
-        <rect x="407" y="108" width="8" height="10" fill="white" opacity="0.7"/>
+        <rect x="375" y="108" width="8"  height="10" fill="white" opacity="0.7"/>
+        <rect x="407" y="108" width="8"  height="10" fill="white" opacity="0.7"/>
         <rect x="435" y="65"  width="50" height="135" fill="#e8a800"/>
         <rect x="490" y="80"  width="35" height="120" fill="#c0392b"/>
         <rect x="530" y="50"  width="55" height="150" fill="#1a3a6b"/>
@@ -180,7 +174,6 @@
         <rect x="1670" y="145" width="730" height="55" fill="url(#wave2)"/>
         <rect x="1670" y="60"  width="50" height="140" fill="#c0392b"/>
         <rect x="1725" y="45"  width="55" height="155" fill="#e8a800"/>
-        <rect x="1730" y="25"  width="10" height="22"  fill="#e8a800"/>
         <rect x="1785" y="70"  width="45" height="130" fill="#1a3a6b"/>
         <rect x="1835" y="50"  width="55" height="150" fill="#c0392b"/>
         <rect x="1895" y="75"  width="40" height="125" fill="#e8a800"/>
@@ -193,23 +186,13 @@
         <rect x="2270" y="60"  width="50" height="140" fill="#1a3a6b"/>
         <rect x="2325" y="75"  width="45" height="125" fill="#c0392b"/>
         <rect x="2375" y="50"  width="55" height="150" fill="#e8a800"/>
-        <rect x="88"  y="60"  width="8"  height="8"  fill="white" opacity="0.5"/>
-        <rect x="102" y="60"  width="8"  height="8"  fill="white" opacity="0.5"/>
-        <rect x="88"  y="78"  width="8"  height="8"  fill="white" opacity="0.5"/>
-        <rect x="102" y="78"  width="8"  height="8"  fill="white" opacity="0.5"/>
-        <rect x="193" y="65"  width="8"  height="8"  fill="white" opacity="0.5"/>
-        <rect x="213" y="65"  width="8"  height="8"  fill="white" opacity="0.5"/>
-        <rect x="193" y="83"  width="8"  height="8"  fill="white" opacity="0.5"/>
-        <rect x="300" y="55"  width="8"  height="8"  fill="white" opacity="0.5"/>
-        <rect x="534" y="60"  width="8"  height="8"  fill="white" opacity="0.5"/>
-        <rect x="548" y="60"  width="8"  height="8"  fill="white" opacity="0.5"/>
-        <rect x="755" y="55"  width="8"  height="8"  fill="white" opacity="0.5"/>
-        <rect x="1190" y="60" width="8"  height="8"  fill="white" opacity="0.5"/>
+        <rect x="88"  y="60"  width="8" height="8" fill="white" opacity="0.5"/>
+        <rect x="102" y="60"  width="8" height="8" fill="white" opacity="0.5"/>
+        <rect x="534" y="60"  width="8" height="8" fill="white" opacity="0.5"/>
+        <rect x="755" y="55"  width="8" height="8" fill="white" opacity="0.5"/>
         <path d="M200 25 Q205 20 210 25" stroke="#1a3a6b" stroke-width="1.5" fill="none"/>
-        <path d="M215 20 Q220 15 225 20" stroke="#1a3a6b" stroke-width="1.5" fill="none"/>
         <path d="M600 30 Q605 25 610 30" stroke="#1a3a6b" stroke-width="1.5" fill="none"/>
         <path d="M900 18 Q905 13 910 18" stroke="#1a3a6b" stroke-width="1.5" fill="none"/>
-        <path d="M915 23 Q920 18 925 23" stroke="#1a3a6b" stroke-width="1.5" fill="none"/>
         <rect x="0" y="198" width="2400" height="2" fill="#1a3a6b" opacity="0.3"/>
       </svg>
     </div>
@@ -218,7 +201,7 @@
   <!-- Footer -->
   <footer class="page-footer">
     <p>© {{ currentTime | date:'yyyy' }} City Government of Taguig &nbsp;·&nbsp; Visitor Kiosk System</p>
-    <p class="footer-sub">Para sa tulong, makipag-ugnayan sa pinakamalapit na security personnel.</p>
+    <p class="footer-sub">{{ labels.footerSub }}</p>
   </footer>
 
 </div>

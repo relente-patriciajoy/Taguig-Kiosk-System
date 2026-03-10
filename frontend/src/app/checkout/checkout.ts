@@ -2,6 +2,8 @@ import { Component, ChangeDetectorRef, ChangeDetectionStrategy, OnDestroy, NgZon
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { VisitorService } from '../visitor.service';
+import { LangService, AppLabels } from '../services/lang.service';
+import { Subscription } from 'rxjs';
 
 type CheckoutStep = 'scan' | 'result';
 type InputMode = 'scanner' | 'manual';
@@ -17,6 +19,8 @@ type InputMode = 'scanner' | 'manual';
 export class CheckoutComponent implements OnDestroy {
 
   // Properties
+  labels!: AppLabels;
+  private langSub!: Subscription;
   currentStep: CheckoutStep = 'scan';
   inputMode: InputMode = 'scanner';
   visitorData: any = null;
@@ -34,14 +38,20 @@ export class CheckoutComponent implements OnDestroy {
     private visitorService: VisitorService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private zone: NgZone
+    private zone: NgZone,
+    private langService: LangService
   ) {
+    this.langSub = this.langService.lang$.subscribe(() => {
+      this.labels = this.langService.labels;
+      this.cdr.markForCheck();
+    });
     this.attachScannerListener();
   }
 
   ngOnDestroy(): void {
     this.detachScannerListener();
     this.clearScanTimer();
+    if (this.langSub) this.langSub.unsubscribe();
   }
 
   // Methods
