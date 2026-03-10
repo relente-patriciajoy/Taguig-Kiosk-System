@@ -565,3 +565,7 @@ async def process_exit(control_no: str):
 @app.get("/visitors")
 async def get_visitors():
     return list(visitors.values())
+
+@app.get("/stats")
+def get_stats():
+    return {"visitors_today": 0, "visitors_in": 0}
