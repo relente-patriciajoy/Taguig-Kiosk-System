@@ -86,6 +86,7 @@ export class CheckinComponent implements OnDestroy {
     private cdr:            ChangeDetectorRef,
     private langService:    LangService
   ) {
+    this.labels = this.langService.labels;
     this.langSub = this.langService.lang$.subscribe(() => {
       this.labels = this.langService.labels;
       this.cdr.markForCheck();

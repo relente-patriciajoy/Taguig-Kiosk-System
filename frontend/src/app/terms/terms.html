@@ -1,0 +1,149 @@
+<div class="terms-wrap">
+
+  <!-- Header -->
+  <header class="terms-header">
+    <img src="taguig-logo.png" alt="Taguig Logo" class="header-logo"
+         onerror="this.style.display='none'">
+    <div class="header-text">
+      <h1 class="header-title">{{ labels.termsHeaderTitle }}</h1>
+      <p class="header-sub">{{ labels.termsHeaderSub }}</p>
+    </div>
+  </header>
+
+  <!-- Card -->
+  <div class="terms-card">
+
+    <div class="terms-top">
+      <div class="shield-icon">🛡️</div>
+      <h2 class="terms-title">{{ labels.termsTitle }}</h2>
+      <p class="terms-subtitle">{{ labels.termsSubtitle }}</p>
+      <div class="law-badge">
+        <span>📋 {{ labels.termsLawBadge }}</span>
+      </div>
+    </div>
+
+    <!-- Scrollable content -->
+    <div class="terms-body" (scroll)="onScroll($event)">
+
+      <!-- Section 1 -->
+      <div class="terms-section">
+        <h3 class="section-title">
+          <span class="section-num">01</span>
+          {{ labels.termsS1Title }}
+        </h3>
+        <p>{{ labels.termsS1Body }}</p>
+        <ul>
+          <li>{{ labels.termsS1Li1 }}</li>
+          <li>{{ labels.termsS1Li2 }}</li>
+          <li>{{ labels.termsS1Li3 }}</li>
+          <li>{{ labels.termsS1Li4 }}</li>
+          <li>{{ labels.termsS1Li5 }}</li>
+        </ul>
+      </div>
+
+      <!-- Section 2 -->
+      <div class="terms-section">
+        <h3 class="section-title">
+          <span class="section-num">02</span>
+          {{ labels.termsS2Title }}
+        </h3>
+        <p>{{ labels.termsS2Body }}</p>
+        <ul>
+          <li>{{ labels.termsS2Li1 }}</li>
+          <li>{{ labels.termsS2Li2 }}</li>
+          <li>{{ labels.termsS2Li3 }}</li>
+        </ul>
+      </div>
+
+      <!-- Section 3 -->
+      <div class="terms-section">
+        <h3 class="section-title">
+          <span class="section-num">03</span>
+          {{ labels.termsS3Title }}
+        </h3>
+        <p>{{ labels.termsS3Body }}</p>
+        <ul>
+          <li>{{ labels.termsS3Li1 }}</li>
+          <li>{{ labels.termsS3Li2 }}</li>
+          <li>{{ labels.termsS3Li3 }}</li>
+          <li>{{ labels.termsS3Li4 }}</li>
+        </ul>
+      </div>
+
+      <!-- Section 4 -->
+      <div class="terms-section">
+        <h3 class="section-title">
+          <span class="section-num">04</span>
+          {{ labels.termsS4Title }}
+        </h3>
+        <p>{{ labels.termsS4Body }}</p>
+        <ul>
+          <li>{{ labels.termsS4Li1 }}</li>
+          <li>{{ labels.termsS4Li2 }}</li>
+          <li>{{ labels.termsS4Li3 }}</li>
+          <li>{{ labels.termsS4Li4 }}</li>
+          <li>{{ labels.termsS4Li5 }}</li>
+          <li>{{ labels.termsS4Li6 }}</li>
+        </ul>
+      </div>
+
+      <!-- Section 5 -->
+      <div class="terms-section">
+        <h3 class="section-title">
+          <span class="section-num">05</span>
+          {{ labels.termsS5Title }}
+        </h3>
+        <p>{{ labels.termsS5Body }}</p>
+      </div>
+
+      <!-- Section 6 -->
+      <div class="terms-section">
+        <h3 class="section-title">
+          <span class="section-num">06</span>
+          {{ labels.termsS6Title }}
+        </h3>
+        <p>{{ labels.termsS6Body }}</p>
+      </div>
+
+      <!-- Section 7 -->
+      <div class="terms-section">
+        <h3 class="section-title">
+          <span class="section-num">07</span>
+          {{ labels.termsS7Title }}
+        </h3>
+        <p>{{ labels.termsS7Body }}</p>
+        <div class="contact-box">
+          <p><strong>{{ labels.termsContactDPO }}</strong></p>
+          <p>{{ labels.termsContactOffice }}</p>
+          <p>{{ labels.termsContactAddr }}</p>
+          <p>{{ labels.termsContactEmail }}</p>
+        </div>
+      </div>
+
+      <!-- Scroll indicator -->
+      <div class="scroll-end-marker">
+        <span *ngIf="!scrolledToBottom" class="scroll-hint">↓ {{ labels.termsScrollHint }}</span>
+        <span *ngIf="scrolledToBottom" class="scroll-done">✓ {{ labels.termsScrollDone }}</span>
+      </div>
+
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="terms-actions">
+      <button (click)="decline()" class="btn-decline">
+        {{ labels.termsDecline }}
+      </button>
+      <button
+        (click)="accept()"
+        class="btn-accept"
+        [class.btn-accept-ready]="scrolledToBottom"
+        [disabled]="!scrolledToBottom">
+        {{ labels.termsAccept }}
+      </button>
+    </div>
+
+    <p class="terms-note">{{ labels.termsNote }}</p>
+
+  </div>
+
+</div>

@@ -38,6 +38,7 @@ export class LandingComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Sync labels from shared service (reacts to toggle too)
+    this.labels = this.langService.labels;
     this.langSub = this.langService.lang$.subscribe(() => {
       this.labels = this.langService.labels;
       this.cdr.markForCheck();

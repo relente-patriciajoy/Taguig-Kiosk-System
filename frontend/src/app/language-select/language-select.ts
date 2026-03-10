@@ -23,6 +23,6 @@ export class LanguageSelectComponent {
     this.animating = lang;
     this.langService.setLang(lang);
     // Short delay so the user sees the selection flash before navigating
-    setTimeout(() => this.router.navigate(['/home']), 420);
+    setTimeout(() => this.router.navigate(['/terms']), 420);
   }
 }
