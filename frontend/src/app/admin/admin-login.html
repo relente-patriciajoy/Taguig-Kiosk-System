@@ -1,0 +1,84 @@
+<div class="login-page">
+
+  <!-- Background pattern -->
+  <div class="bg-pattern"></div>
+
+  <!-- Back button -->
+  <button class="btn-back" (click)="goHome()">← Back to Kiosk</button>
+
+  <!-- Login card -->
+  <div class="login-card" [class.shake]="isShaking">
+
+    <!-- Header -->
+    <div class="card-header">
+      <div class="logo-wrap">
+        <img src="taguig-logo.png" alt="Taguig" class="logo"
+             onerror="this.style.display='none'">
+        <div class="logo-fallback" *ngIf="true"></div>
+      </div>
+      <h1 class="card-title">Admin Portal</h1>
+      <p class="card-sub">City Government of Taguig<br>Visitor Kiosk System</p>
+    </div>
+
+    <!-- Divider -->
+    <div class="card-divider"></div>
+
+    <!-- Form -->
+    <div class="login-form">
+
+      <!-- Username -->
+      <div class="field-group">
+        <label class="field-label">Username</label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input
+            type="text"
+            class="field-input"
+            placeholder="Enter username"
+            [(ngModel)]="username"
+            (keyup.enter)="onLogin()"
+            autocomplete="off"
+            spellcheck="false">
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input
+            [type]="showPass ? 'text' : 'password'"
+            class="field-input"
+            placeholder="Enter password"
+            [(ngModel)]="password"
+            (keyup.enter)="onLogin()"
+            autocomplete="current-password">
+          <button class="btn-toggle-pass" (click)="togglePass()" type="button">
+            {{ showPass ? '🙈' : '👁️' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div class="error-msg" *ngIf="errorMsg">
+        ⚠️ {{ errorMsg }}
+      </div>
+
+      <!-- Submit -->
+      <button
+        class="btn-login"
+        (click)="onLogin()"
+        [disabled]="isLoading">
+        <span *ngIf="!isLoading">🔐 Sign In</span>
+        <span *ngIf="isLoading" class="loading-dots">Verifying<span>.</span><span>.</span><span>.</span></span>
+      </button>
+
+    </div>
+
+    <!-- Footer note -->
+    <p class="login-note">🔒 Authorized personnel only. Access is logged.</p>
+
+  </div>
+
+</div>

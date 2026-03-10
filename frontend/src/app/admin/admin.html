@@ -1,0 +1,156 @@
+<div class="admin-page">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="taguig-logo.png" alt="Taguig" class="sidebar-logo"
+           onerror="this.style.display='none'">
+      <div class="sidebar-brand-text">
+        <span class="brand-title">TAGUIG</span>
+        <span class="brand-sub">Admin Portal</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-item nav-active">
+        <span class="nav-icon">📊</span>
+        <span>Dashboard</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="backend-status" [class.online]="backendOnline" [class.offline]="!backendOnline">
+        <span class="status-dot"></span>
+        <span>{{ backendOnline ? 'Backend Online' : 'Backend Offline' }}</span>
+      </div>
+      <button class="btn-logout" (click)="logout()">🚪 Log Out</button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <h1 class="page-title">Visitor Dashboard</h1>
+        <p class="page-sub">{{ currentTime | date:'EEEE, MMMM d, yyyy · hh:mm:ss a' }}</p>
+      </div>
+      <div class="top-bar-right">
+        <input
+          type="date"
+          class="date-picker"
+          [(ngModel)]="filterDate"
+          (change)="onDateChange()">
+      </div>
+    </header>
+
+    <!-- Stat Cards -->
+    <section class="stat-cards">
+      <div class="stat-card stat-total">
+        <div class="stat-icon">👥</div>
+        <div class="stat-info">
+          <span class="stat-num">{{ visitorsToday }}</span>
+          <span class="stat-label">Total Today</span>
+        </div>
+      </div>
+      <div class="stat-card stat-inside">
+        <div class="stat-icon">🏛️</div>
+        <div class="stat-info">
+          <span class="stat-num">{{ visitorsInside }}</span>
+          <span class="stat-label">Currently Inside</span>
+        </div>
+      </div>
+      <div class="stat-card stat-out">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <span class="stat-num">{{ visitorsOut }}</span>
+          <span class="stat-label">Checked Out</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Offline Notice -->
+    <div class="offline-banner" *ngIf="!backendOnline">
+      ⚠️ Backend is offline — showing demo data. Connect your backend to see live records.
+    </div>
+
+    <!-- Filters -->
+    <section class="filters-bar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search by name, control #, or purpose..."
+          [(ngModel)]="searchQuery">
+      </div>
+      <div class="filter-tabs">
+        <button class="filter-tab" [class.active]="filterStatus === 'all'"       (click)="filterStatus = 'all'">All</button>
+        <button class="filter-tab" [class.active]="filterStatus === 'inside'"    (click)="filterStatus = 'inside'">Inside</button>
+        <button class="filter-tab" [class.active]="filterStatus === 'checked-out'" (click)="filterStatus = 'checked-out'">Checked Out</button>
+      </div>
+    </section>
+
+    <!-- Table -->
+    <section class="table-wrap">
+      <div class="table-loading" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <span>Loading records...</span>
+      </div>
+
+      <table class="visitor-table" *ngIf="!isLoading">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Control No.</th>
+            <th>Full Name</th>
+            <th>ID Type</th>
+            <th>Purpose</th>
+            <th>Time In</th>
+            <th>Time Out</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of filteredRecords; trackBy: trackById; let i = index">
+            <td class="col-num">{{ i + 1 }}</td>
+            <td class="col-control">
+              <span class="control-badge">{{ r.control_no }}</span>
+            </td>
+            <td class="col-name">{{ r.full_name }}</td>
+            <td class="col-idtype">{{ r.id_type }}</td>
+            <td class="col-purpose">{{ r.purpose }}</td>
+            <td class="col-time">{{ r.time_in }}</td>
+            <td class="col-time">{{ r.time_out ?? '—' }}</td>
+            <td class="col-status">
+              <span class="status-badge" [ngClass]="getStatusClass(r.status)">
+                {{ r.status === 'inside' ? '🟢 Inside' : '⚪ Out' }}
+              </span>
+            </td>
+            <td class="col-action">
+              <button
+                class="btn-checkout"
+                *ngIf="r.status === 'inside'"
+                (click)="manualCheckout(r)">
+                Check Out
+              </button>
+              <span class="done-label" *ngIf="r.status === 'checked-out'">✓ Done</span>
+            </td>
+          </tr>
+          <tr *ngIf="filteredRecords.length === 0">
+            <td colspan="9" class="empty-row">No records found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Table Footer -->
+    <div class="table-footer" *ngIf="!isLoading">
+      Showing {{ filteredRecords.length }} of {{ records.length }} records
+    </div>
+
+  </main>
+
+</div>
