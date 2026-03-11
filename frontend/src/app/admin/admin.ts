@@ -139,6 +139,8 @@ export class AdminComponent implements OnInit, OnDestroy {
     });
   }
 
+  goToReports(): void { this.router.navigate(['/admin/reports']); }
+
   logout(): void {
     this.auth.logout();
     this.router.navigate(['/home']);

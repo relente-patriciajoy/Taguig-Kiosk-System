@@ -257,6 +257,66 @@ def get_visitors(date: Optional[str] = Query(default=None)):
         db.close()
 
 
+
+
+@app.get("/admin/visitors/range")
+def get_visitors_range(month: str = Query(default=None), year: str = Query(default=None)):
+    """
+    Return visitors filtered by month (YYYY-MM) or year (YYYY).
+    Used by the Reports page.
+    """
+    db = get_db()
+    try:
+        with db.cursor() as cur:
+            if month:
+                cur.execute(
+                    """
+                    SELECT id, control_no, full_name, id_type, purpose,
+                           time_in, time_out, status
+                    FROM visitors
+                    WHERE DATE_FORMAT(time_in, '%Y-%m') = %s
+                    ORDER BY time_in DESC
+                    """,
+                    (month,),
+                )
+            elif year:
+                cur.execute(
+                    """
+                    SELECT id, control_no, full_name, id_type, purpose,
+                           time_in, time_out, status
+                    FROM visitors
+                    WHERE YEAR(time_in) = %s
+                    ORDER BY time_in DESC
+                    """,
+                    (year,),
+                )
+            else:
+                raise HTTPException(status_code=400, detail="Provide month=YYYY-MM or year=YYYY")
+
+            rows = cur.fetchall()
+
+        visitors = [
+            {
+                "id":         r["id"],
+                "control_no": r["control_no"],
+                "full_name":  r["full_name"],
+                "id_type":    r["id_type"] or "—",
+                "purpose":    r["purpose"],
+                "time_in":    fmt_datetime(r["time_in"]),
+                "time_out":   fmt_datetime(r["time_out"]),
+                "status":     r["status"],
+            }
+            for r in rows
+        ]
+        label = month or year
+        return {"visitors": visitors, "period": label, "total": len(visitors)}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
 @app.post("/capture-id")
 def capture_id(body: CaptureIdRequest):
     """
