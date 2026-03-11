@@ -424,18 +424,36 @@ export class CheckinComponent implements OnDestroy {
     this.loading         = true;
     this.cdr.markForCheck();
 
-    // Generate QR locally first (works offline/Netlify with no backend)
+    // Generate QR locally first so ticket shows instantly even if backend is slow
     this.qrCodeImage = this.generateQrDataUrl(this.visitorData.control_no);
 
-    // Also try backend — if it returns a data URI, prefer it
-    this.visitorService.getQrCode(this.visitorData.control_no, purpose).subscribe({
+    // Save to database via POST /checkin
+    const payload = {
+      full_name: this.visitorData.full_name  ?? this.visitorData.name ?? '',
+      birthday:  this.visitorData.birthday   ?? null,
+      address:   this.visitorData.address    ?? null,
+      id_type:   this.visitorData.id_type    ?? this.selectedIdType ?? null,
+      id_number: this.visitorData.id_number  ?? null,
+      purpose,
+    };
+
+    console.log('[CHECKIN] Sending payload to backend:', payload);
+
+    this.visitorService.checkIn(payload).subscribe({
       next: (res: any) => {
-        const raw = res.qr_code as string;
-        if (raw && raw.startsWith('data:')) this.qrCodeImage = raw;
+        console.log('[CHECKIN] Backend response:', res);
+        if (res?.control_no) {
+          this.visitorData = { ...this.visitorData, control_no: res.control_no };
+          this.qrCodeImage = this.generateQrDataUrl(res.control_no);
+        }
+        const today = parseInt(sessionStorage.getItem('tgk_today') ?? '0', 10);
+        const inside = parseInt(sessionStorage.getItem('tgk_in')   ?? '0', 10);
+        sessionStorage.setItem('tgk_today', String(today + 1));
+        sessionStorage.setItem('tgk_in',    String(inside + 1));
         this.preloadQrThenShowTicket();
       },
-      error: () => {
-        // Already set locally above — just show ticket
+      error: (err: any) => {
+        console.error('[CHECKIN] Backend error:', err);
         this.preloadQrThenShowTicket();
       }
     });
