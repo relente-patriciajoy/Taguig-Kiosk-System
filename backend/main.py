@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import base64
 import io
+import os
 import random
 import string
 from datetime import datetime, date
@@ -40,12 +41,15 @@ app.add_middleware(
 # ─────────────────────────────────────────────────────────
 #  Database config  — change only if you customized XAMPP
 # ─────────────────────────────────────────────────────────
+import os
+
+# Works both locally (XAMPP) and on Railway (env vars)
 DB_CONFIG = {
-    "host":     "127.0.0.1",
-    "port":     3306,
-    "user":     "root",       # default XAMPP user
-    "password": "",           # default XAMPP password (blank)
-    "db":       "taguig_kiosk",
+    "host":     os.environ.get("MYSQLHOST",     "127.0.0.1"),
+    "port":     int(os.environ.get("MYSQLPORT", "3306")),
+    "user":     os.environ.get("MYSQLUSER",     "root"),
+    "password": os.environ.get("MYSQLPASSWORD", ""),
+    "db":       os.environ.get("MYSQLDATABASE", "taguig_kiosk"),
     "charset":  "utf8mb4",
     "cursorclass": pymysql.cursors.DictCursor,
     "autocommit": True,
