@@ -4,4 +4,3 @@ pymysql
 pillow
 python-multipart
 numpy
-easyocr
