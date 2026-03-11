@@ -7,6 +7,9 @@ This project is a modern, web-based kiosk system designed for the **Information 
 You can access the live frontend deployment here:
  **[View Live Kiosk](https://verdant-malasada-943d32.netlify.app/)**
 
+You can access the Admin Dashboard here:
+ **[Admin Dashboard](https://verdant-malasada-943d32.netlify.app/admin/login)**
+ 
 > **Note:** For the best experience and to test the scanning features, please open the link on a **mobile device**.
 
 ---
