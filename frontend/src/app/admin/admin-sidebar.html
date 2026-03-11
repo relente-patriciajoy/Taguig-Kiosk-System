@@ -1,0 +1,42 @@
+<aside class="sidebar">
+
+  <div class="sidebar-brand">
+    <img src="taguig-logo.png" alt="Taguig" class="sidebar-logo"
+         onerror="this.style.display='none'">
+    <div class="sidebar-brand-text">
+      <span class="brand-title">TAGUIG</span>
+      <span class="brand-sub">Admin Portal</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+
+    <p class="nav-section-label">MENU</p>
+
+    <div class="nav-item"
+         [class.nav-active]="activePage === 'dashboard'"
+         (click)="goToDashboard()">
+      <span class="nav-icon">📊</span>
+      <span>Dashboard</span>
+    </div>
+
+    <div class="nav-item"
+         [class.nav-active]="activePage === 'reports'"
+         (click)="goToReports()">
+      <span class="nav-icon">📋</span>
+      <span>Reports</span>
+    </div>
+
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="backend-status"
+         [class.online]="backendOnline"
+         [class.offline]="!backendOnline">
+      <span class="status-dot"></span>
+      <span>{{ backendOnline ? 'Backend Online' : 'Backend Offline' }}</span>
+    </div>
+    <button class="btn-logout" (click)="logout()">🚪 Log Out</button>
+  </div>
+
+</aside>

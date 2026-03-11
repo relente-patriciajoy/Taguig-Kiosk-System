@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { AdminSidebarComponent } from './admin-sidebar';
 
 export interface ReportRecord {
   id:         number;
@@ -23,7 +24,7 @@ export interface ReportRecord {
 @Component({
   selector: 'app-admin-reports',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AdminSidebarComponent],
   templateUrl: './admin-reports.html',
   styleUrl: './admin-reports.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -72,11 +73,6 @@ export class AdminReportsComponent implements OnInit {
   }
 
   // ── Navigation ──────────────────────────────────────────────────────────
-  goToDashboard(): void { this.router.navigate(['/admin']); }
-  logout(): void {
-    this.auth.logout();
-    this.router.navigate(['/admin/login']);
-  }
 
   // ── Load data ───────────────────────────────────────────────────────────
   onFilterChange(): void { this.loadReport(); }

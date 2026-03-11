@@ -269,15 +269,17 @@ def get_visitors_range(month: str = Query(default=None), year: str = Query(defau
     try:
         with db.cursor() as cur:
             if month:
+                # month is YYYY-MM — split and use YEAR()/MONTH() for compatibility
+                year_part, month_part = month.split('-')
                 cur.execute(
                     """
                     SELECT id, control_no, full_name, id_type, purpose,
                            time_in, time_out, status
                     FROM visitors
-                    WHERE DATE_FORMAT(time_in, '%Y-%m') = %s
+                    WHERE YEAR(time_in) = %s AND MONTH(time_in) = %s
                     ORDER BY time_in DESC
                     """,
-                    (month,),
+                    (year_part, int(month_part)),
                 )
             elif year:
                 cur.execute(
