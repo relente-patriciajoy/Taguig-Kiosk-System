@@ -294,14 +294,25 @@
     display: none !important;
   }
 
-  .admin-page   { display: block; }
-  .main-content { padding: 0; }
+  /* Full width — no sidebar space */
+  .admin-page {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .main-content {
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
 
   .report-wrap {
     box-shadow: none;
     border-radius: 0;
     padding: 0;
     border: none;
+    width: 100% !important;
   }
 
   /* Show footer in print */

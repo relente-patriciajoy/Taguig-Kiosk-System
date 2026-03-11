@@ -151,3 +151,9 @@
 }
 
 .btn-logout:hover { background: rgba(231,76,60,0.25); }
+
+/* ── Hide sidebar completely when printing ── */
+@media print {
+  :host { display: none !important; }
+  .sidebar { display: none !important; }
+}
