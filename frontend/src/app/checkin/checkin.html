@@ -1,5 +1,14 @@
 <div class="kiosk-wrap">
 
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="loading">
+    <div class="loading-box">
+      <div class="loading-spinner"></div>
+      <p class="loading-title">{{ labels.readingId || 'Reading ID...' }}</p>
+      <p class="loading-sub">{{ labels.pleaseWait || 'Please wait, do not remove your ID' }}</p>
+    </div>
+  </div>
+
   <!-- Header -->
   <header class="kiosk-header">
     <img src="taguig-logo.png" alt="Taguig Logo" class="header-logo"

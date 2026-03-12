@@ -18,7 +18,7 @@ export interface AppLabels {
   startingCamera: string; cameraUnavail: string; cameraAnotherApp: string; retryCamera: string;
   cameraDenied: string; cameraDeniedHint: string; alignId: string; photoTaken: string;
   captureManually: string; idVisibleQ: string; retake: string; looksGood: string;
-  readingId: string; processing: string; backToIdSelection: string;
+  readingId: string; processing: string; pleaseWait: string; backToIdSelection: string;
   frameDefault: string; frameNoId: string; frameTooFar: string; frameTooClose: string;
   frameBlurry: string; frameGood: string; scanningLabel: string; scanSubHint: string;
   manualDesc: string; manualRequired: string; fullName: string; fullNamePH: string;
@@ -85,7 +85,7 @@ export const LABELS: Record<Lang, AppLabels> = {
     alignId: 'Align your ID within the box', photoTaken: '✅ Photo Taken',
     captureManually: '📷 Capture Manually', idVisibleQ: 'Is your ID clearly visible in the photo?',
     retake: '↩ Retake', looksGood: '✅ Looks Good — Submit',
-    readingId: '⏳ Reading ID...', processing: '⏳ Processing...',
+    readingId: '⏳ Reading ID...', processing: '⏳ Processing...', pleaseWait: 'Please wait, do not remove your ID',
     backToIdSelection: '← Back to ID Selection',
     frameDefault: 'Place your ID in the frame',
     frameNoId: '🔴 No ID detected — place your ID in the frame',
@@ -204,7 +204,7 @@ export const LABELS: Record<Lang, AppLabels> = {
     alignId: 'Ilagay ang inyong ID sa loob ng kahon', photoTaken: '✅ Nakuha ang Litrato',
     captureManually: '📷 Kumuha ng Litrato', idVisibleQ: 'Malinaw ba ang inyong ID sa litrato?',
     retake: '↩ Kumuha Muli', looksGood: '✅ Maganda — Isumite',
-    readingId: '⏳ Binabasa ang ID...', processing: '⏳ Pinoproseso...',
+    readingId: '⏳ Binabasa ang ID...', processing: '⏳ Pinoproseso...', pleaseWait: 'Maghintay, huwag alisin ang iyong ID',
     backToIdSelection: '← Bumalik sa Pagpili ng ID',
     frameDefault: 'Ilagay ang inyong ID sa frame',
     frameNoId: '🔴 Walang ID na nakita — ilagay ang inyong ID sa frame',
