@@ -862,3 +862,35 @@
 }
 
 .highlight-row { background: #f0fff4; padding: 10px 8px !important; border-radius: 8px; }
+
+/* ── Barcode ── */
+.barcode-wrap {
+  text-align: center;
+  border-top: 1px dashed #ccc;
+  margin-top: 16px;
+  padding-top: 16px;
+}
+
+.barcode-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #555;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.barcode-canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.barcode-text {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: #333;
+  margin-top: 6px;
+  letter-spacing: 2px;
+}

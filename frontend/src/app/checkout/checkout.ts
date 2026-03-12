@@ -115,15 +115,20 @@ export class CheckoutComponent implements OnDestroy {
   }
 
   private onGlobalKeydown(e: KeyboardEvent): void {
-    // Ignore if we're not in scanner mode or already processing
-    if (this.inputMode !== 'scanner' || this.loading || this.currentStep !== 'scan') return;
     // Ignore modifier keys
     if (e.ctrlKey || e.altKey || e.metaKey) return;
 
-    if (e.key === 'Enter') {
+    // Log every key for debugging
+    console.log('[SCANNER] key:', JSON.stringify(e.key), 'mode:', this.inputMode, 'step:', this.currentStep, 'buffer:', this.scanBuffer);
+
+    // Ignore if we're not in scanner mode or already processing
+    if (this.inputMode !== 'scanner' || this.loading || this.currentStep !== 'scan') return;
+
+    if (e.key === 'Enter' || e.key === 'Tab') {
       this.clearScanTimer();
       const code = this.scanBuffer.trim().toUpperCase();
       this.scanBuffer = '';
+      console.log('[SCANNER] Submitting code:', code);
       if (code.length > 3) {
         this.zone.run(() => {
           this.scannerReady = false;
@@ -137,10 +142,18 @@ export class CheckoutComponent implements OnDestroy {
     if (e.key.length === 1) {
       this.scanBuffer += e.key;
       this.clearScanTimer();
-      // If no Enter comes within timeout, clear buffer (manual key press, not scanner)
+      // Increased timeout to 1000ms for slower scanners
       this.scanTimer = setTimeout(() => {
+        console.log('[SCANNER] Buffer timeout, trying to submit:', this.scanBuffer);
+        const code = this.scanBuffer.trim().toUpperCase();
         this.scanBuffer = '';
-      }, 500);
+        if (code.length > 3) {
+          this.zone.run(() => {
+            this.scannerReady = false;
+            this.processCheckout(code);
+          });
+        }
+      }, 1000);
     }
   }
 

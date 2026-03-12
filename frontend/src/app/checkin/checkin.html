@@ -369,15 +369,10 @@
           <p><strong>{{ labels.labelTimeIn }}:</strong> {{ visitorData?.time_in }}</p>
           <p><strong>{{ labels.labelControl }}:</strong> {{ visitorData?.control_no }}</p>
         </div>
-        <div class="qr-wrap">
-          <p class="qr-label">{{ labels.scanAtExit }}</p>
-          <img *ngIf="qrCodeImage && qrLoaded" [src]="qrCodeImage" class="qr-img" alt="QR Code">
-          <div *ngIf="!qrLoaded && !qrError" class="qr-loading">
-            <div class="spinner"></div>
-          </div>
-          <img *ngIf="qrCodeImage" [src]="qrCodeImage" style="display:none"
-               (load)="onQrLoaded()" (error)="onQrError()">
-          <p class="qr-control">{{ labels.labelControl }}: <strong>{{ visitorData?.control_no }}</strong></p>
+        <div class="barcode-wrap">
+          <p class="barcode-label">{{ labels.scanAtExit }}</p>
+          <canvas #barcodeCanvas class="barcode-canvas"></canvas>
+          <p class="barcode-text">{{ visitorData?.control_no }}</p>
         </div>
         <div class="pass-actions no-print">
           <button (click)="printPass()" class="btn-print">{{ labels.printReceipt }}</button>

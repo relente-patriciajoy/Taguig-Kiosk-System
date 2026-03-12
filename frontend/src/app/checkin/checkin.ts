@@ -32,6 +32,7 @@ export class CheckinComponent implements OnDestroy {
 
   @ViewChild('videoEl')    videoEl!:    ElementRef<HTMLVideoElement>;
   @ViewChild('canvasEl')   canvasEl!:   ElementRef<HTMLCanvasElement>;
+  @ViewChild('barcodeCanvas') barcodeCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('phoneImgEl') phoneImgEl!: ElementRef<HTMLImageElement>;
 
   // Properties
@@ -46,6 +47,7 @@ export class CheckinComponent implements OnDestroy {
   qrCodeImage             = '';
   qrLoaded                = false;
   qrError                 = false;
+  barcodeReady            = false;
   selectedIdType          = '';
   frameStatus:  FrameStatus = 'no_id';
   frameMessage            = '';
@@ -424,10 +426,7 @@ export class CheckinComponent implements OnDestroy {
     this.loading         = true;
     this.cdr.markForCheck();
 
-    // Generate QR locally first so ticket shows instantly even if backend is slow
-    this.qrCodeImage = this.generateQrDataUrl(this.visitorData.control_no);
-
-    // Save to database via POST /checkin
+    // Save to database via POST /checkin — QR is generated AFTER we get the real control_no
     const payload = {
       full_name: this.visitorData.full_name  ?? this.visitorData.name ?? '',
       birthday:  this.visitorData.birthday   ?? null,
@@ -442,10 +441,11 @@ export class CheckinComponent implements OnDestroy {
     this.visitorService.checkIn(payload).subscribe({
       next: (res: any) => {
         console.log('[CHECKIN] Backend response:', res);
-        if (res?.control_no) {
-          this.visitorData = { ...this.visitorData, control_no: res.control_no };
-          this.qrCodeImage = this.generateQrDataUrl(res.control_no);
-        }
+        // Always use server control_no for QR so it matches the database
+        const controlNo = res?.control_no ?? this.visitorData.control_no;
+        this.visitorData = { ...this.visitorData, control_no: controlNo };
+        this.qrCodeImage = this.generateQrDataUrl(controlNo);
+        console.log('[CHECKIN] QR generated for:', controlNo);
         const today = parseInt(sessionStorage.getItem('tgk_today') ?? '0', 10);
         const inside = parseInt(sessionStorage.getItem('tgk_in')   ?? '0', 10);
         sessionStorage.setItem('tgk_today', String(today + 1));
@@ -454,6 +454,8 @@ export class CheckinComponent implements OnDestroy {
       },
       error: (err: any) => {
         console.error('[CHECKIN] Backend error:', err);
+        // Fallback — use locally generated control_no
+        this.qrCodeImage = this.generateQrDataUrl(this.visitorData.control_no);
         this.preloadQrThenShowTicket();
       }
     });
@@ -464,12 +466,86 @@ export class CheckinComponent implements OnDestroy {
     this.qrError     = false;
     this.loading     = false;
     this.currentStep = 'ticket';
-    // Increment session counters for landing page display
-    const today = parseInt(sessionStorage.getItem('tgk_today') ?? '0', 10);
-    const inside = parseInt(sessionStorage.getItem('tgk_in')   ?? '0', 10);
-    sessionStorage.setItem('tgk_today', String(today  + 1));
-    sessionStorage.setItem('tgk_in',    String(inside + 1));
     this.cdr.markForCheck();
+    // Draw barcode after view renders
+    setTimeout(() => {
+      this.qrLoaded = true;
+      this.drawBarcode(this.visitorData?.control_no ?? '');
+      this.cdr.markForCheck();
+    }, 300);
+  }
+
+  private drawBarcode(text: string): void {
+    const canvas = this.barcodeCanvas?.nativeElement;
+    if (!canvas || !text) return;
+
+    // Code 128B encoder
+    const START_B = 104, STOP = 106, CODE_B_OFFSET = 32;
+    const chars = text.split('').map(ch => ch.charCodeAt(0) - CODE_B_OFFSET);
+
+    // Calculate checksum
+    let checksum = START_B;
+    chars.forEach((v, i) => checksum += v * (i + 1));
+    checksum %= 103;
+
+    const allCodes = [START_B, ...chars, checksum, STOP];
+
+    // Code 128 bar patterns (11 bars each)
+    const PATTERNS: Record<number, string> = {
+      0:'11011001100',1:'11001101100',2:'11001100110',3:'10010011000',
+      4:'10010001100',5:'10001001100',6:'10011001000',7:'10011000100',
+      8:'10001100100',9:'11001001000',10:'11001000100',11:'11000100100',
+      12:'10110011100',13:'10011011100',14:'10011001110',15:'10111001100',
+      16:'10011101100',17:'10011100110',18:'11001110010',19:'11001011100',
+      20:'11001001110',21:'11011100100',22:'11001110100',23:'11101101110',
+      24:'11101001100',25:'11100101100',26:'11100100110',27:'11101100100',
+      28:'11100110100',29:'11100110010',30:'11011011000',31:'11011000110',
+      32:'11000110110',33:'10100011000',34:'10001011000',35:'10001000110',
+      36:'10110001000',37:'10001101000',38:'10001100010',39:'11010001000',
+      40:'11000101000',41:'11000100010',42:'10110111000',43:'10110001110',
+      44:'10001101110',45:'10111011000',46:'10111000110',47:'10001110110',
+      48:'11101110110',49:'11010001110',50:'11000101110',51:'11011101000',
+      52:'11011100010',53:'11011101110',54:'11101011000',55:'11101000110',
+      56:'11100010110',57:'11101101000',58:'11101100010',59:'11100011010',
+      60:'11101111010',61:'11001000010',62:'11110001010',63:'10100110000',
+      64:'10100001100',65:'10010110000',66:'10010000110',67:'10000101100',
+      68:'10000100110',69:'10110010000',70:'10110000100',71:'10011010000',
+      72:'10011000010',73:'10000110100',74:'10000110010',75:'11000010010',
+      76:'11001010000',77:'11110111010',78:'11000010100',79:'10001111010',
+      80:'10100111100',81:'10010111100',82:'10010011110',83:'10111100100',
+      84:'10011110100',85:'10011110010',86:'11110100100',87:'11110010100',
+      88:'11110010010',89:'11011011110',90:'11011110110',91:'11110110110',
+      92:'10101111000',93:'10100011110',94:'10001011110',95:'10111101000',
+      96:'10111100010',97:'11110101000',98:'11110100010',99:'10111011110',
+      100:'10111101110',101:'11101011110',102:'11110101110',
+      103:'11010000100',104:'11010010000',105:'11010011100',106:'11000111010'
+    };
+
+    const barWidth  = 2;
+    const barHeight = 80;
+    const quiet     = 10;
+
+    // Build bar string
+    let barStr = '';
+    for (const code of allCodes) {
+      barStr += PATTERNS[code] ?? '';
+    }
+    barStr += '11'; // termination bar
+
+    const totalWidth = quiet * 2 + barStr.length * barWidth;
+    canvas.width  = totalWidth;
+    canvas.height = barHeight + 20;
+
+    const ctx = canvas.getContext('2d')!;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = '#000000';
+    for (let i = 0; i < barStr.length; i++) {
+      if (barStr[i] === '1') {
+        ctx.fillRect(quiet + i * barWidth, 0, barWidth, barHeight);
+      }
+    }
   }
 
   retryCamera(): void {
@@ -480,7 +556,8 @@ export class CheckinComponent implements OnDestroy {
 
   printPass(): void {
     const v     = this.visitorData;
-    const qrUrl = this.qrCodeImage || this.generateQrDataUrl(v.control_no);
+    const barcodeCanvas = this.barcodeCanvas?.nativeElement;
+    const barcodeUrl = barcodeCanvas ? barcodeCanvas.toDataURL('image/png') : '';
     const html  = `<!DOCTYPE html>
 <html>
 <head>
@@ -513,7 +590,8 @@ export class CheckinComponent implements OnDestroy {
   <div class="row" style="border-bottom:none"><span class="label">CONTROL #:</span><span class="value">${v.control_no}</span></div>
   <div class="qr-section">
     <div class="qr-label">Scan at Exit Gate</div>
-    <img class="qr-img" src="${qrUrl}" alt="QR Code">
+    <img class="qr-img" src="${barcodeUrl}" alt="Barcode" style="width:60mm;height:20mm;object-fit:contain;">
+    <div style="font-family:monospace;font-size:7pt;letter-spacing:1px;">${v.control_no}</div>
   </div>
   <div class="footer">Thank you for visiting! Please keep this receipt.</div>
   <script>
