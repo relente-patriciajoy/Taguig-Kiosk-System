@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 export class VisitorService {
   // Change this to your Railway URL when deploying to Netlify
   // e.g. private baseUrl = 'https://taguig-backend.up.railway.app';
-  private baseUrl = 'http://10.71.0.41:8000';
+  private baseUrl = 'https://localhost:8000';
 
   constructor(private http: HttpClient) {}
 
@@ -34,7 +34,7 @@ export class VisitorService {
   // Send captured image for OCR
   captureId(imageBase64: string, idType: string): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/capture-id`, {
-      image_base64: imageBase64,
+      image: imageBase64,
       id_type: idType
     });
   }

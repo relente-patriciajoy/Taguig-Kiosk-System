@@ -325,33 +325,138 @@ def get_visitors_range(month: str = Query(default=None), year: str = Query(defau
 
 @app.post("/capture-id")
 def capture_id(body: CaptureIdRequest):
-    """
-    Receive a base64 image, run EasyOCR, return extracted text.
-    Falls back gracefully if EasyOCR is not installed.
-    """
     try:
         import easyocr
         import numpy as np
         from PIL import Image
+        import re
 
-        img_bytes  = base64.b64decode(body.image)
-        pil_image  = Image.open(io.BytesIO(img_bytes)).convert("RGB")
-        img_array  = np.array(pil_image)
+        img_bytes = base64.b64decode(body.image)
+        pil_image = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+        img_array = np.array(pil_image)
 
         reader  = easyocr.Reader(["en"], gpu=False, verbose=False)
         results = reader.readtext(img_array, detail=0)
         text    = " ".join(results)
+        ocr_lines = [r.strip() for r in results if r.strip()]
 
-        return {"success": True, "text": text, "lines": results}
+        full_name   = ""
+        birthday    = ""
+        address     = ""
+        id_number   = ""
+        last_name   = ""
+        first_name  = ""
+        middle_name = ""
+
+        date_pat = r"(\d{1,2}[/\-.] ?\d{1,2}[/\-.] ?\d{2,4}|(?:JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER|JAN|FEB|MAR|APR|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\.?\s+\d{1,2},?\s+\d{4})"
+
+        # ── Strategy: find label lines then grab next line as value ──
+        label_map = {}
+        for i, line in enumerate(ocr_lines):
+            lu = line.upper().strip()
+            nxt = ocr_lines[i + 1].strip() if i + 1 < len(ocr_lines) else ""
+
+            if "APELYIDO" in lu or ("LAST" in lu and "NAME" in lu):
+                label_map["last"] = nxt
+            if "PANGALAN" in lu or ("GIVEN" in lu and "NAME" in lu):
+                label_map["first"] = nxt
+            if "GITNANG" in lu or ("MIDDLE" in lu and "NAME" in lu):
+                label_map["middle"] = nxt
+            if "PETSA" in lu or "KAPANGANAKAN" in lu or ("DATE" in lu and "BIRTH" in lu):
+                dm = re.search(date_pat, nxt, re.IGNORECASE)
+                label_map["birthday"] = dm.group(0) if dm else nxt
+            if "TIRAHAN" in lu or ("ADDRESS" in lu and "ID" not in lu):
+                nxt2 = ocr_lines[i + 2].strip() if i + 2 < len(ocr_lines) else ""
+                parts = [p for p in [nxt, nxt2] if p and "REPUBLIC" not in p.upper() and "PILIPINAS" not in p.upper()]
+                label_map["address"] = ", ".join(parts)
+
+        # ── Fallback: scan all lines for values when labels are missing ──
+        # PhilSys ID has a fixed order after the header:
+        # line 0: "REPUBLIKA NG PILIPINAS" or similar header
+        # line 1: "PAMBANSANG PAGKAKAKILANLAN" label
+        # line 2: ID number (e.g. J140-9842-0818-2871)
+        # line 3: Last name
+        # line 4: First name
+        # line 5: Middle name
+        # then date of birth, address...
+
+        # Find the ID number line first — it anchors everything else
+        id_idx = None
+        for i, line in enumerate(ocr_lines):
+            m = re.search(r"[A-Z0-9]{3,5}[\s\-][0-9]{4}[\s\-][0-9]{4}[\s\-][0-9]{4}", line)
+            if m:
+                id_number = m.group(0)
+                id_idx = i
+                break
+
+        if id_idx is not None:
+            # PhilSys layout after ID number line:
+            # id_idx + 0 = ID number  (e.g. 3140-9842-0616-2971)
+            # id_idx + 1 = Last name  (e.g. RELENTE)
+            # id_idx + 2 = First name (e.g. PATRICIA Joy)
+            # id_idx + 3 = Middle name label OR middle name value
+            # id_idx + 4 = Middle name value (if line 3 was label)
+
+            if not label_map.get("last") and id_idx + 1 < len(ocr_lines):
+                label_map["last"] = ocr_lines[id_idx + 1].strip()
+
+            if not label_map.get("first") and id_idx + 2 < len(ocr_lines):
+                label_map["first"] = ocr_lines[id_idx + 2].strip()
+
+            # Middle name: skip label-like lines (short, contains "GITNANG" or "MIDDLE" or "GHNANG")
+            if not label_map.get("middle") and id_idx + 3 < len(ocr_lines):
+                candidate = ocr_lines[id_idx + 3].strip()
+                lu_c = candidate.upper()
+                is_label = any(k in lu_c for k in ["GITNANG", "MIDDLE", "GHNANG", "GITNA", "APELYIDO"]) or len(candidate) < 4
+                if is_label and id_idx + 4 < len(ocr_lines):
+                    candidate = ocr_lines[id_idx + 4].strip()
+                if not re.search(date_pat, candidate, re.IGNORECASE) and candidate.upper() not in ["PHL", "PHI", "PH"]:
+                    label_map["middle"] = candidate
+
+        # Also scan every line for ID number pattern and date
+        for i, line in enumerate(ocr_lines):
+            lu = line.upper().strip()
+            if not id_number:
+                m = re.search(r"[A-Z0-9]{3,4}[\s\-][0-9]{4}[\s\-][0-9]{4}[\s\-][0-9]{4}", line)
+                if m:
+                    id_number = m.group(0)
+            if not label_map.get("birthday"):
+                dm = re.search(date_pat, line, re.IGNORECASE)
+                if dm:
+                    label_map["birthday"] = dm.group(0)
+            if not label_map.get("address"):
+                if any(k in lu for k in ["BRGY", "BARANGAY", "ZONE", "STREET", "METRO MANILA", "TAGUIG", "KATUPARAN", "SAMPALOK", "MANILA", "CITY OF", "NCR"]):
+                    label_map["address"] = line
+
+        # Assign from label_map
+        last_name   = label_map.get("last", "").title()
+        first_name  = label_map.get("first", "").title()
+        middle_name = label_map.get("middle", "").title()
+        birthday    = label_map.get("birthday", "")
+        address     = label_map.get("address", "")
+
+        if last_name and first_name:
+            full_name = f"{first_name} {middle_name} {last_name}".strip() if middle_name else f"{first_name} {last_name}".strip()
+        elif last_name:
+            full_name = last_name
+        elif first_name:
+            full_name = first_name
+
+        return {
+            "success":   True,
+            "text":      text,
+            "lines":     ocr_lines,
+            "full_name": full_name,
+            "birthday":  birthday,
+            "address":   address,
+            "id_number": id_number,
+            "id_type":   body.id_type,
+        }
 
     except ImportError:
-        return {
-            "success": False,
-            "text":    "",
-            "error":   "EasyOCR not installed. Run: pip install easyocr"
-        }
+        return {"success": False, "text": "", "full_name": "", "birthday": "", "address": "", "id_number": "", "error": "EasyOCR not installed."}
     except Exception as e:
-        return {"success": False, "text": "", "error": str(e)}
+        return {"success": False, "text": "", "full_name": "", "birthday": "", "address": "", "id_number": "", "error": str(e)}
 
 
 @app.get("/visitor/{control_no}")

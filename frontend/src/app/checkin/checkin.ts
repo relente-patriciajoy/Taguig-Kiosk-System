@@ -403,7 +403,20 @@ export class CheckinComponent implements OnDestroy {
     const base64Data = this.capturedImageUrl.split(',')[1];
     this.visitorService.captureId(base64Data, this.selectedIdType).subscribe({
       next: (data: any) => {
-        this.visitorData = data;
+        console.log('[OCR] Response:', data);
+        const now = new Date();
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        const timeIn = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        // Map backend response fields to visitorData
+        this.visitorData = {
+          full_name:  data.full_name  || '',
+          birthday:   data.birthday   || '',
+          address:    data.address    || '',
+          id_number:  data.id_number  || '',
+          id_type:    data.id_type    || this.selectedIdType || '',
+          control_no: data.control_no || '',
+          time_in:    timeIn,
+        };
         this.loading     = false;
         this.currentStep = 'preview';
         this.cdr.markForCheck();
@@ -411,6 +424,19 @@ export class CheckinComponent implements OnDestroy {
       error: (err: any) => {
         console.error('OCR error:', err);
         this.loading = false;
+        // Go to preview anyway so user can fill manually
+        const now2 = new Date();
+        const pad2 = (n: number) => n.toString().padStart(2, '0');
+        this.visitorData = {
+          full_name:  '',
+          birthday:   '',
+          address:    '',
+          id_number:  '',
+          id_type:    this.selectedIdType || '',
+          control_no: '',
+          time_in:    `${pad2(now2.getHours())}:${pad2(now2.getMinutes())}:${pad2(now2.getSeconds())}`,
+        };
+        this.currentStep = 'preview';
         this.cdr.markForCheck();
       }
     });
@@ -454,8 +480,14 @@ export class CheckinComponent implements OnDestroy {
       },
       error: (err: any) => {
         console.error('[CHECKIN] Backend error:', err);
-        // Fallback — use locally generated control_no
-        this.qrCodeImage = this.generateQrDataUrl(this.visitorData.control_no);
+        // Fallback — generate a local control_no if backend is offline
+        const now      = new Date();
+        const pad      = (n: number): string => n.toString().padStart(2, '0');
+        const datePart = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+        const randPart = Math.random().toString(36).substring(2, 7).toUpperCase();
+        const fallbackNo = `TGK-${datePart}-${randPart}`;
+        this.visitorData = { ...this.visitorData, control_no: fallbackNo };
+        this.qrCodeImage = this.generateQrDataUrl(fallbackNo);
         this.preloadQrThenShowTicket();
       }
     });
@@ -564,41 +596,50 @@ export class CheckinComponent implements OnDestroy {
   <meta charset="utf-8">
   <title>Visitor Pass</title>
   <style>
-    @page { size: 80mm 200mm; margin: 3mm; }
+    @page { size: 110mm auto; margin: 0; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Courier New', monospace; font-size: 8pt; color: #000; width: 74mm; background: #fff; }
+    body {
+      font-family: 'Courier New', monospace;
+      font-size: 9pt;
+      color: #000;
+      width: 110mm;
+      padding: 3mm 4mm;
+      background: #fff;
+    }
     .header { text-align: center; font-size: 7pt; font-weight: 700; letter-spacing: 1px; margin-bottom: 1mm; }
-    .title  { text-align: center; font-size: 12pt; font-weight: 900; letter-spacing: 2px; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 1.5mm 0; margin-bottom: 2mm; }
+    .title  { text-align: center; font-size: 11pt; font-weight: 900; letter-spacing: 2px; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 1.5mm 0; margin-bottom: 2mm; }
     .row    { display: flex; border-bottom: 1px dotted #aaa; padding: 1mm 0; line-height: 1.4; }
-    .label  { font-weight: 700; min-width: 26mm; }
-    .value  { flex: 1; word-break: break-all; }
-    .qr-section { text-align: center; border-top: 1px dashed #000; margin-top: 2mm; padding-top: 2mm; }
-    .qr-label   { font-size: 7pt; font-weight: 700; margin-bottom: 1.5mm; }
-    .qr-img     { width: 38mm; height: 38mm; display: block; margin: 0 auto; }
-    .footer     { text-align: center; font-size: 7pt; border-top: 1px dashed #000; margin-top: 2mm; padding-top: 2mm; }
+    .label  { font-weight: 700; min-width: 28mm; font-size: 8.5pt; }
+    .value  { flex: 1; word-break: break-all; font-size: 8.5pt; }
+    .barcode-section { text-align: center; border-top: 1px dashed #000; margin-top: 3mm; padding-top: 3mm; }
+    .barcode-label   { font-size: 8pt; font-weight: 700; margin-bottom: 2mm; text-transform: uppercase; letter-spacing: 0.5px; }
+    .barcode-img     { width: 100mm; height: 20mm; display: block; margin: 0 auto; object-fit: fill; image-rendering: pixelated; }
+    .barcode-no      { font-family: monospace; font-size: 8pt; letter-spacing: 2px; margin-top: 1.5mm; }
+    .footer          { text-align: center; font-size: 7.5pt; border-top: 1px dashed #000; margin-top: 3mm; padding-top: 3mm; }
   </style>
 </head>
 <body>
   <div class="header">CITY GOVERNMENT OF TAGUIG</div>
   <div class="title">VISITOR PASS</div>
   <div class="row"><span class="label">NAME:</span><span class="value">${v.full_name}</span></div>
-  <div class="row"><span class="label">BIRTHDAY:</span><span class="value">${v.birthday}</span></div>
+  <div class="row"><span class="label">BIRTHDAY:</span><span class="value">${v.birthday ?? '—'}</span></div>
   <div class="row"><span class="label">ID TYPE:</span><span class="value">${this.selectedIdType}</span></div>
-  <div class="row"><span class="label">ID NUMBER:</span><span class="value">${v.id_number}</span></div>
+  <div class="row"><span class="label">ID NUMBER:</span><span class="value">${v.id_number ?? '—'}</span></div>
   <div class="row"><span class="label">PURPOSE:</span><span class="value">${this.selectedPurpose}</span></div>
   <div class="row"><span class="label">TIME IN:</span><span class="value">${v.time_in}</span></div>
   <div class="row" style="border-bottom:none"><span class="label">CONTROL #:</span><span class="value">${v.control_no}</span></div>
-  <div class="qr-section">
-    <div class="qr-label">Scan at Exit Gate</div>
-    <img class="qr-img" src="${barcodeUrl}" alt="Barcode" style="width:60mm;height:20mm;object-fit:contain;">
-    <div style="font-family:monospace;font-size:7pt;letter-spacing:1px;">${v.control_no}</div>
+  <div class="barcode-section">
+    <div class="barcode-label">── Scan at Exit Gate ──</div>
+    <img class="barcode-img" src="${barcodeUrl}" alt="Barcode">
+    <div class="barcode-no">${v.control_no}</div>
   </div>
-  <div class="footer">Thank you for visiting! Please keep this receipt.</div>
+  <div class="footer">Thank you for visiting Taguig City Hall!<br>Please keep this receipt until exit.</div>
   <script>
     const img = document.querySelector('img');
     const doPrint = () => { window.print(); window.close(); };
-    if (img.complete) { doPrint(); }
-    else { img.onload = doPrint; img.onerror = doPrint; }
+    if (img && img.complete) { doPrint(); }
+    else if (img) { img.onload = doPrint; img.onerror = doPrint; }
+    else { doPrint(); }
   <\/script>
 </body>
 </html>`;

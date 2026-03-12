@@ -63,7 +63,7 @@ export class LandingComponent implements OnInit, OnDestroy {
 
 
   private loadCounters(): void {
-    fetch('http://10.71.0.41:8000/stats')
+    fetch('https://localhost:8000/stats')
       .then(r => r.json())
       .then((data: any) => {
         this.visitorsToday = data.visitors_today ?? 0;

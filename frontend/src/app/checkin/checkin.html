@@ -341,7 +341,7 @@
           <span class="info-value no-edit">{{ selectedIdType }}</span>
         </div>
 
-        <div class="info-row highlight-row">
+        <div class="info-row highlight-row" *ngIf="visitorData?.control_no">
           <span class="info-label">{{ labels.labelControl }}</span>
           <span class="info-value no-edit">{{ visitorData?.control_no }}</span>
         </div>
