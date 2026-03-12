@@ -1,4 +1,9 @@
 # 🏛️ Taguig City Kiosk System
+### Version 1.0.0 | 2026
+
+Built by: Patricia Joy Relente
+OJT Project | Taguig City Hall
+
 **Full-Stack Web Application for Visitor Management and Scanning**
 
 This project is a modern, web-based kiosk system designed for the **Information and Technology Office of the City of Taguig - CCTV**. It streamlines visitor registration and attendance tracking using QR/Barcode scanning technology.
