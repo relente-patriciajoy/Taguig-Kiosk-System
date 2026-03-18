@@ -26,14 +26,14 @@ You can access the Admin Dashboard here:
 - **Build Tool:** Vite
 - **Deployment:** Netlify
 - **Key Features:**
-  - Responsive "Office Siren" / Minimalist UI
+  - Responsive UI
   - Secure HTTPS Camera access for QR scanning
   - SPA Routing with `_redirects` support
 
 ### Backend (In Progress)
 - **Framework:** Python / FastAPI
 - **Database:** SQL
-- **Infrastructure:** Automatic Audit Logging with Spring AOP principles
+- **Infrastructure:** Automatic Audit Logging with Spring AOP (Aspect-Oriented Programming) principles
 
 ---
 
