@@ -16,14 +16,12 @@
     <div class="nav-item"
          [class.nav-active]="activePage === 'dashboard'"
          (click)="goToDashboard()">
-      <span class="nav-icon">📊</span>
       <span>Dashboard</span>
     </div>
 
     <div class="nav-item"
          [class.nav-active]="activePage === 'reports'"
          (click)="goToReports()">
-      <span class="nav-icon">📋</span>
       <span>Reports</span>
     </div>
 
@@ -36,7 +34,7 @@
       <span class="status-dot"></span>
       <span>{{ backendOnline ? 'Backend Online' : 'Backend Offline' }}</span>
     </div>
-    <button class="btn-logout" (click)="logout()">🚪 Log Out</button>
+    <button class="btn-logout" (click)="logout()">Log Out</button>
   </div>
 
 </aside>

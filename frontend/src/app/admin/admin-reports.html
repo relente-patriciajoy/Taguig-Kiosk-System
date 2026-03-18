@@ -13,7 +13,7 @@
         <p class="page-sub">Generate and print visitor records by date, month, or year</p>
       </div>
       <button class="btn-print" (click)="printReport()" [disabled]="records.length === 0">
-        🖨️ Print / Save PDF
+        Print / Save PDF
       </button>
     </header>
 
@@ -25,19 +25,19 @@
           class="mode-tab"
           [class.active]="filterMode === 'day'"
           (click)="filterMode = 'day'; onFilterChange()">
-          📅 By Date
+            By Date
         </button>
         <button
           class="mode-tab"
           [class.active]="filterMode === 'month'"
           (click)="filterMode = 'month'; onFilterChange()">
-          🗓️ By Month
+            By Month
         </button>
         <button
           class="mode-tab"
           [class.active]="filterMode === 'year'"
           (click)="filterMode = 'year'; onFilterChange()">
-          📆 By Year
+            By Year
         </button>
       </div>
 
