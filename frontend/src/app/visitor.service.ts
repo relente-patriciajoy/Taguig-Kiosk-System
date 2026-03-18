@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 export class VisitorService {
   // Change this to your Railway URL when deploying to Netlify
   // e.g. private baseUrl = 'https://taguig-backend.up.railway.app';
-  private baseUrl = 'https://localhost:8000';
+  private baseUrl = 'https://10.71.0.53:8000';
 
   constructor(private http: HttpClient) {}
 

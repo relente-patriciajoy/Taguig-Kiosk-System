@@ -10,6 +10,8 @@ import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { AdminSidebarComponent } from './admin-sidebar';
 
+const API_URL = 'https://10.71.0.53:8000'; // Change to Railway URL for production
+
 export interface ReportRecord {
   id:         number;
   control_no: string;
@@ -84,11 +86,11 @@ export class AdminReportsComponent implements OnInit {
 
     let url = '';
     if (this.filterMode === 'day') {
-      url = `http://127.0.0.1:8000/admin/visitors?date=${this.filterDay}`;
+      url = `${API_URL}/admin/visitors?date=${this.filterDay}`;
     } else if (this.filterMode === 'month') {
-      url = `http://127.0.0.1:8000/admin/visitors/range?month=${this.filterMonth}`;
+      url = `${API_URL}/admin/visitors/range?month=${this.filterMonth}`;
     } else {
-      url = `http://127.0.0.1:8000/admin/visitors/range?year=${this.filterYear}`;
+      url = `${API_URL}/admin/visitors/range?year=${this.filterYear}`;
     }
 
     fetch(url)

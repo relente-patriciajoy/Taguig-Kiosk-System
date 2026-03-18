@@ -11,6 +11,8 @@ import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { AdminSidebarComponent } from './admin-sidebar';
 
+const API_URL = 'https://10.71.0.53:8000';
+
 export interface VisitorRecord {
   id:          number;
   control_no:  string;
@@ -91,7 +93,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   private loadRecords(): void {
-    fetch(`http://127.0.0.1:8000/admin/visitors?date=${this.filterDate}`)
+    fetch(`${API_URL}/admin/visitors?date=${this.filterDate}`)
       .then(r => r.json())
       .then((data: any) => {
         this.backendOnline = true;
@@ -125,7 +127,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   manualCheckout(record: VisitorRecord): void {
     if (!confirm(`Check out ${record.full_name}?`)) return;
 
-    fetch(`http://127.0.0.1:8000/checkout`, {
+    fetch(`${API_URL}/checkout`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ control_no: record.control_no })
