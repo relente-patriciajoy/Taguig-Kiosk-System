@@ -459,6 +459,13 @@ def capture_id(body: CaptureIdRequest):
         return {"success": False, "text": "", "full_name": "", "birthday": "", "address": "", "id_number": "", "error": str(e)}
 
 
+@app.get("/rootCA.pem")
+def download_root_ca():
+    from fastapi.responses import FileResponse
+    import os
+    ca_path = os.path.join(os.path.dirname(__file__), "rootCA.pem")
+    return FileResponse(ca_path, media_type="application/x-pem-file", filename="rootCA.pem")
+
 @app.get("/visitor/{control_no}")
 def get_visitor(control_no: str):
     """Look up a single visitor by control number."""
